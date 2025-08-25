@@ -69,7 +69,9 @@
       "e2eTestRunner": "playwright",
       "linter": "eslint",
       "style": "scss",
-      "unitTestRunner": "jest"
+      "unitTestRunner": "jest",
+      "inlineTemplate": true,
+      "inlineStyle": true
     },
     "@nx/angular:library": {
       "linter": "eslint",
@@ -77,6 +79,11 @@
     },
     "@nx/angular:component": {
       "style": "css"
+    },
+    "@schematics/angular:component": {
+      "inlineTemplate": true,
+      "inlineStyle": true,
+      "style": "scss"
     }
   },
   "release": {
