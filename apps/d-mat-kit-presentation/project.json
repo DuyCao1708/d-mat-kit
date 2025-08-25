@@ -1,0 +1,91 @@
+{
+  "name": "d-mat-kit-presentation",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/d-mat-kit-presentation/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/d-mat-kit-presentation",
+        "browser": "apps/d-mat-kit-presentation/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/d-mat-kit-presentation/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/d-mat-kit-presentation/public"
+          }
+        ],
+        "styles": ["apps/d-mat-kit-presentation/src/styles.scss"]
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@angular/build:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "d-mat-kit-presentation:build:production"
+        },
+        "development": {
+          "buildTarget": "d-mat-kit-presentation:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular/build:extract-i18n",
+      "options": {
+        "buildTarget": "d-mat-kit-presentation:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/d-mat-kit-presentation/jest.config.ts",
+        "tsConfig": "apps/d-mat-kit-presentation/tsconfig.spec.json"
+      }
+    },
+    "serve-static": {
+      "continuous": true,
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "d-mat-kit-presentation:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/d-mat-kit-presentation/browser",
+        "spa": true
+      }
+    }
+  }
+}
