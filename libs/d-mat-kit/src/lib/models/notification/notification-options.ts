@@ -14,4 +14,6 @@ export type DNotificationOptions = {
 export type DToastOptions = {
   type: DNotificationType | 'error' | 'success' | 'warn';
   message: string;
+  toastClass?: string;
+  timeout?: number;
 };
