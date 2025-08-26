@@ -9,5 +9,9 @@
 }
 
 .d-toast-dialog-panel {
+  .mat-mdc-dialog-surface {
+    overflow: visible;
+  }
+
   --mat-dialog-container-color: transparent;
 }

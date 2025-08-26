@@ -4,8 +4,8 @@ import {
   MatDialogContent,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { DNotificationOptions, DNotificationType } from '../../models';
-import { NOTIFICATION_INTL } from '../../tokens/d-mat-kit-intl';
+import { DNotificationOptions, DNotificationType } from '../../../models';
+import { NOTIFICATION_INTL } from '../../../tokens/d-mat-kit-intl';
 import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
 
 @Component({

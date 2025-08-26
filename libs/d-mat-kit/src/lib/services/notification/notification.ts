@@ -8,8 +8,8 @@ import {
   DNotificationOptions,
   DToastOptions,
 } from '../../models/notification/notification-options';
-import { DNotificationDialog } from '../../components/notification-dialog/notification-dialog';
-import { DToastDialog } from '../../components/toast-dialog/toast-dialog';
+import { DNotificationDialog } from '../../components/notification/notification-dialog/notification-dialog';
+import { DToastDialog } from '../../components/notification/toast-dialog/toast-dialog';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -18,7 +18,10 @@ import { BehaviorSubject } from 'rxjs';
 export class DNotification {
   private readonly _dialog = inject(MatDialog);
   private readonly _toastsOptions: DToastOptions[] = [];
-  private readonly _toastsOptions$ = new BehaviorSubject<DToastOptions[]>(this._toastsOptions);
+  private readonly _toastsOptions$ = new BehaviorSubject<DToastOptions[]>(
+    this._toastsOptions
+  );
+  private _toastDialogRef: MatDialogRef<DToastDialog> | null = null;
 
   notify(
     options: DNotificationOptions,
@@ -44,13 +47,13 @@ export class DNotification {
       data: this._toastsOptions$.asObservable(),
     };
 
-    const dialogRef = this._dialog.open(DToastDialog, dialogConfig);
-
     this.setToastOptionsToSubject(options);
 
-    // setTimeout(() => dialogRef.close(), 5000);
+    if (!this._toastDialogRef) {
+      this._toastDialogRef = this._dialog.open(DToastDialog, dialogConfig);
+    }
 
-    return dialogRef;
+    return this._toastDialogRef;
   }
 
   private setToastOptionsToSubject(options: DToastOptions): void {

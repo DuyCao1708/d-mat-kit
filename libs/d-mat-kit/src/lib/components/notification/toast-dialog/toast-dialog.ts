@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
-import { DToastOptions } from '../../models';
+import { DToastOptions } from '../../../models';
 import { Toast } from '../toast/toast';
 
 @Component({
