@@ -15,7 +15,7 @@ export class ComponentViewer {
   private readonly _notification = inject(DNotification);
 
   constructor() {
-    // this._notification.toast({ type: 'warn', message: 'hehe' });
+    this._notification.notify({ type: 'warn', message: 'hehe' });
   }
 
   toast(): void {

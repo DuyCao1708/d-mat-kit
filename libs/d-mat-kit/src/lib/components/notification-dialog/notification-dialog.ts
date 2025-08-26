@@ -59,15 +59,15 @@ import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
     `
       .d-notification-title {
         &.d-notification-title-success {
-          color: #96cb78;
+          color: var(--d-notification-success-title-color);
         }
 
         &.d-notification-title-error {
-          color: var(--mat-sys-error);
+          color: var(--d-notification-error-title-color);
         }
 
         &.d-notification-title-warn {
-          color: #eab383;
+          color: var(--d-notification-warn-title-color);
         }
       }
 
@@ -86,7 +86,7 @@ import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
     `
       .d-notification .d-notification-success {
         border-radius: 50%;
-        border: 4px solid #a5dc86;
+        border: 4px solid var(--d-notification-success-icon-color);
         box-sizing: content-box;
         height: 80px;
         padding: 0;
@@ -148,7 +148,7 @@ import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
 
         .d-notification-success-tip,
         .d-notification-success-long {
-          background-color: #a5dc86;
+          background-color: var(--d-notification-success-icon-color);
           border-radius: 2px;
           height: 5px;
           position: absolute;
@@ -235,7 +235,7 @@ import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
     `
       .d-notification .d-notification-warn {
         border-radius: 50%;
-        border: 4px solid #f8bb86;
+        border: 4px solid var(--d-notification-warn-icon-color);
         box-sizing: content-box;
         height: 80px;
         padding: 0;
@@ -266,7 +266,7 @@ import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
         }
 
         .d-notification-warn-body {
-          background-color: #f8bb86;
+          background-color: var(--d-notification-warn-icon-color);
           border-radius: 2px;
           height: 47px;
           left: 50%;
@@ -279,7 +279,7 @@ import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
         }
 
         .d-notification-warn-dot {
-          background-color: #f8bb86;
+          background-color: var(--d-notification-warn-icon-color);
           border-radius: 50%;
           bottom: 10px;
           height: 7px;
@@ -320,7 +320,7 @@ import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
         }
 
         100% {
-          background-color: #f8bb86;
+          background-color: var(--d-notification-warn-icon-color);
           transform: scale(2);
           opacity: 0;
         }
@@ -332,14 +332,14 @@ import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
         }
 
         100% {
-          background-color: #f8bb86;
+          background-color: var(--d-notification-warn-icon-color);
         }
       }
     `,
     `
       .d-notification .d-notification-error {
         border-radius: 50%;
-        border: 4px solid #f27474;
+        border: 4px solid var(--d-notification-error-icon-color);
         box-sizing: content-box;
         height: 80px;
         padding: 0;
@@ -413,7 +413,7 @@ import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
           height: 5px;
           position: absolute;
           z-index: 2;
-          background-color: #f27474;
+          background-color: var(--d-notification-error-icon-color);
           top: 37px;
           width: 47px;
         }

@@ -1,3 +1,13 @@
+:root {
+  --d-notification-success-title-color: #96cb78;
+  --d-notification-error-title-color: var(--mat-sys-error);
+  --d-notification-warn-title-color: #eab383;
+
+  --d-notification-success-icon-color: #a5dc86;
+  --d-notification-error-icon-color: #f27474;
+  --d-notification-warn-icon-color: #f8bb86;
+}
+
 .d-toast-dialog-panel {
   --mat-dialog-container-color: transparent;
 }
