@@ -1,0 +1,526 @@
+import { Component, inject } from '@angular/core';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogContent,
+  MatDialogTitle,
+} from '@angular/material/dialog';
+import { DNotificationOptions, DNotificationType } from '../../models';
+import { NOTIFICATION_INTL } from '../../tokens/d-mat-kit-intl';
+import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
+
+@Component({
+  selector: 'd-notification-dialog',
+  imports: [MatDialogTitle, MatDialogContent, MarkdownComponent],
+  template: `
+    <h2 mat-dialog-title class="d-notification-title" [class]="titleClassList">
+      {{ title }}
+    </h2>
+
+    <mat-dialog-content [style.overflow]="'visible'">
+      <section class="d-notification">
+        @switch (type) {
+        <!--prettier-ignore-->
+        @case ('success') {
+        <div class="d-notification-success">
+          <div class="d-notification-success-tip"></div>
+          <div class="d-notification-success-long"></div>
+          <div class="d-notification-success-placeholder"></div>
+          <div class="d-notification-success-fix"></div>
+        </div>
+        }
+        <!--prettier-ignore-->
+        @case ('error') {
+        <div class="d-notification-error">
+          <div class="d-notification-error-x">
+            <div class="d-notification-error-left"></div>
+            <div class="d-notification-error-right"></div>
+          </div>
+          <div class="d-notification-error-placeholder"></div>
+          <div class="d-notification-error-fix"></div>
+        </div>
+        }
+        <!--prettier-ignore-->
+        @case ('warn') {
+        <div class="d-notification-warn">
+          <div class="d-notification-warn-body"></div>
+          <div class="d-notification-warn-dot"></div>
+        </div>
+        } }
+      </section>
+
+      <section class="d-notification-message">
+        <markdown>
+          {{ message }}
+        </markdown>
+      </section>
+    </mat-dialog-content>
+  `,
+  styles: [
+    `
+      .d-notification-title {
+        &.d-notification-title-success {
+          color: #96cb78;
+        }
+
+        &.d-notification-title-error {
+          color: var(--mat-sys-error);
+        }
+
+        &.d-notification-title-warn {
+          color: #eab383;
+        }
+      }
+
+      .d-notification {
+        height: 108px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .d-notification-message {
+        text-align: center;
+        margin-top: 1rem;
+      }
+    `,
+    `
+      .d-notification .d-notification-success {
+        border-radius: 50%;
+        border: 4px solid #a5dc86;
+        box-sizing: content-box;
+        height: 80px;
+        padding: 0;
+        position: relative;
+        background-color: inherit;
+        width: 80px;
+
+        &:after,
+        &:before {
+          background: inherit;
+          content: '';
+          height: 120px;
+          position: absolute;
+          transform: rotate(45deg);
+          width: 60px;
+        }
+
+        &:before {
+          border-radius: 40px 0 0 40px;
+          width: 26px;
+          height: 80px;
+          top: -17px;
+          left: 5px;
+          transform-origin: 60px 60px;
+          transform: rotate(-45deg);
+        }
+
+        &:after {
+          border-radius: 0 120px 120px 0;
+          left: 30px;
+          top: -11px;
+          transform-origin: 0 60px;
+          transform: rotate(-45deg);
+          animation: rotatePlaceholder 4.25s ease-in;
+        }
+
+        .d-notification-success-placeholder {
+          border-radius: 50%;
+          border: 4px solid rgba(165, 220, 134, 0.25);
+          box-sizing: content-box;
+          height: 80px;
+          left: -4px;
+          position: absolute;
+          top: -4px;
+          width: 80px;
+          z-index: 2;
+        }
+
+        .d-notification-success-fix {
+          background-color: inherit;
+          height: 90px;
+          left: 28px;
+          position: absolute;
+          top: 8px;
+          transform: rotate(-45deg);
+          width: 5px;
+          z-index: 1;
+        }
+
+        .d-notification-success-tip,
+        .d-notification-success-long {
+          background-color: #a5dc86;
+          border-radius: 2px;
+          height: 5px;
+          position: absolute;
+          z-index: 2;
+        }
+
+        .d-notification-success-tip {
+          left: 14px;
+          top: 46px;
+          transform: rotate(45deg);
+          width: 25px;
+          animation: animateSuccessTip 0.75s;
+        }
+
+        .d-notification-success-long {
+          right: 8px;
+          top: 38px;
+          transform: rotate(-45deg);
+          width: 47px;
+          animation: animateSuccessLong 0.75s;
+        }
+      }
+
+      @keyframes animateSuccessTip {
+        0%,
+        54% {
+          width: 0;
+          left: 1px;
+          top: 19px;
+        }
+
+        70% {
+          width: 50px;
+          left: -8px;
+          top: 37px;
+        }
+
+        84% {
+          width: 17px;
+          left: 21px;
+          top: 48px;
+        }
+
+        100% {
+          width: 25px;
+          left: 14px;
+          top: 45px;
+        }
+      }
+
+      @keyframes animateSuccessLong {
+        0%,
+        65% {
+          width: 0;
+          right: 46px;
+          top: 54px;
+        }
+
+        84% {
+          width: 55px;
+          right: 0;
+          top: 35px;
+        }
+
+        100% {
+          width: 47px;
+          right: 8px;
+          top: 38px;
+        }
+      }
+
+      @keyframes rotatePlaceholder {
+        0%,
+        5% {
+          transform: rotate(-45deg);
+        }
+
+        100%,
+        12% {
+          transform: rotate(-405deg);
+        }
+      }
+    `,
+    `
+      .d-notification .d-notification-warn {
+        border-radius: 50%;
+        border: 4px solid #f8bb86;
+        box-sizing: content-box;
+        height: 80px;
+        padding: 0;
+        position: relative;
+        background-color: inherit;
+        width: 80px;
+        animation: scaleWarn 0.75s infinite alternate;
+
+        &:after,
+        &:before {
+          background: inherit;
+          content: '';
+          border-radius: 50%;
+          height: 100%;
+          position: absolute;
+          width: 100%;
+        }
+
+        &:before {
+          display: inline-block;
+          opacity: 0;
+          animation: pulseWarn 2s linear infinite;
+        }
+
+        &:after {
+          display: block;
+          z-index: 1;
+        }
+
+        .d-notification-warn-body {
+          background-color: #f8bb86;
+          border-radius: 2px;
+          height: 47px;
+          left: 50%;
+          margin-left: -2px;
+          position: absolute;
+          top: 10px;
+          width: 5px;
+          z-index: 2;
+          animation: pulseWarnIns 0.75s infinite alternate;
+        }
+
+        .d-notification-warn-dot {
+          background-color: #f8bb86;
+          border-radius: 50%;
+          bottom: 10px;
+          height: 7px;
+          left: 50%;
+          margin-left: -3px;
+          position: absolute;
+          width: 7px;
+          z-index: 2;
+          animation: pulseWarnIns 0.75s infinite alternate;
+        }
+      }
+
+      @keyframes scaleWarn {
+        0% {
+          transform: scale(1);
+        }
+
+        30% {
+          transform: scale(1.02);
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes pulseWarn {
+        0% {
+          background-color: inherit;
+          transform: scale(1);
+          opacity: 0.5;
+        }
+
+        30% {
+          background-color: inherit;
+          transform: scale(1);
+          opacity: 0.5;
+        }
+
+        100% {
+          background-color: #f8bb86;
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+
+      @keyframes pulseWarnIns {
+        0% {
+          background-color: #f8d486;
+        }
+
+        100% {
+          background-color: #f8bb86;
+        }
+      }
+    `,
+    `
+      .d-notification .d-notification-error {
+        border-radius: 50%;
+        border: 4px solid #f27474;
+        box-sizing: content-box;
+        height: 80px;
+        padding: 0;
+        position: relative;
+        background-color: inherit;
+        width: 80px;
+        animation: animateErrorIcon 0.5s;
+
+        &:after,
+        &:before {
+          background: inherit;
+          content: '';
+          height: 120px;
+          position: absolute;
+          transform: rotate(45deg);
+          width: 60px;
+        }
+
+        &:before {
+          border-radius: 40px 0 0 40px;
+          width: 26px;
+          height: 80px;
+          top: -17px;
+          left: 5px;
+          transform-origin: 60px 60px;
+          transform: rotate(-45deg);
+        }
+
+        &:after {
+          border-radius: 0 120px 120px 0;
+          left: 30px;
+          top: -11px;
+          transform-origin: 0 60px;
+          transform: rotate(-45deg);
+          animation: rotatePlaceholder 4.25s ease-in;
+        }
+
+        .d-notification-error-x {
+          display: block;
+          position: relative;
+          z-index: 2;
+        }
+
+        .d-notification-error-placeholder {
+          border-radius: 50%;
+          border: 4px solid rgba(200, 0, 0, 0.2);
+          box-sizing: content-box;
+          height: 80px;
+          left: -4px;
+          position: absolute;
+          top: -4px;
+          width: 80px;
+          z-index: 2;
+        }
+
+        .d-notification-error-fix {
+          background-color: inherit;
+          height: 90px;
+          left: 28px;
+          position: absolute;
+          top: 8px;
+          transform: rotate(-45deg);
+          width: 5px;
+          z-index: 1;
+        }
+
+        .d-notification-error-left,
+        .d-notification-error-right {
+          border-radius: 2px;
+          display: block;
+          height: 5px;
+          position: absolute;
+          z-index: 2;
+          background-color: #f27474;
+          top: 37px;
+          width: 47px;
+        }
+
+        .d-notification-error-left {
+          left: 17px;
+          transform: rotate(45deg);
+          animation: animateXLeft 0.75s;
+        }
+
+        .d-notification-error-right {
+          right: 16px;
+          transform: rotate(-45deg);
+          animation: animateXRight 0.75s;
+        }
+      }
+
+      @keyframes animateErrorIcon {
+        0% {
+          transform: rotateX(100deg);
+          opacity: 0;
+        }
+
+        100% {
+          transform: rotateX(0deg);
+          opacity: 1;
+        }
+      }
+
+      @keyframes animateXLeft {
+        0%,
+        65% {
+          left: 82px;
+          top: 95px;
+          width: 0;
+        }
+
+        84% {
+          left: 14px;
+          top: 33px;
+          width: 47px;
+        }
+
+        100% {
+          left: 17px;
+          top: 37px;
+          width: 47px;
+        }
+      }
+
+      @keyframes animateXRight {
+        0%,
+        65% {
+          right: 82px;
+          top: 95px;
+          width: 0;
+        }
+
+        84% {
+          right: 14px;
+          top: 33px;
+          width: 47px;
+        }
+
+        100% {
+          right: 16px;
+          top: 37px;
+          width: 47px;
+        }
+      }
+    `,
+  ],
+  providers: [provideMarkdown()],
+})
+export class DNotificationDialog {
+  private readonly _notificationIntl = inject(NOTIFICATION_INTL, {
+    optional: true,
+  });
+
+  readonly title: string;
+  readonly titleClassList: string;
+  readonly type: DNotificationType;
+  readonly message: string;
+
+  constructor() {
+    const options = inject(MAT_DIALOG_DATA);
+
+    this.title = options.title || this.getDefaultTitle(options);
+    this.titleClassList = [
+      options.titleClass || '',
+      `d-notification-title-${options.type}`,
+    ].join(' ');
+
+    this.type = options.type;
+    this.message = options.message;
+  }
+
+  private getDefaultTitle(options: DNotificationOptions): string {
+    switch (options.type) {
+      case DNotificationType.Success:
+        return this._notificationIntl?.titleSuccess || 'Success';
+      case DNotificationType.Error:
+        return this._notificationIntl?.titleError || 'Error';
+      case DNotificationType.Warn:
+        return this._notificationIntl?.titleWarn || 'Warn';
+      default:
+        return '';
+    }
+  }
+}

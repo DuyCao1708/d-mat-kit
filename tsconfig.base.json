@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@duycaotu/d-mat-kit": ["libs/d-mat-kit/src/index.ts"]
+      "@duycaotu/d-mat-kit": ["libs/d-mat-kit/src/index.ts"],
+      "@d-mat-kit/styles": ["libs/d-mat-kit/src/styles/styles.scss"]
     }
   },
   "exclude": ["node_modules", "tmp"]
