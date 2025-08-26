@@ -1,15 +1,15 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'navbar',
+  selector: 'alert-overview',
   imports: [],
   template: `
     <p>
-      navbar works!
+      alert-overview works!
     </p>
   `,
   styles: ``
 })
-export class Navbar {
+export class AlertOverview {
 
 }
