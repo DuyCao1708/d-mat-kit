@@ -25,7 +25,7 @@ export class DSwipe {
    * Default is 'horizontal'.
    */
   swipeOrientation = input<DSwipeOrientation>('horizontal', {
-    alias: 'orientation',
+    alias: 'dSwipeable',
   });
   /**
    * The minimum distance in pixels the user must swipe to trigger the `swiped` event.
@@ -50,41 +50,12 @@ export class DSwipe {
 
   private readonly _elementRef = inject(ElementRef);
   private readonly _renderer = inject(Renderer2);
-  private readonly _wrapperElement: HTMLElement;
   private readonly _removeListenerFncs: (() => void)[] = [];
 
-  constructor() {
-    this._wrapperElement = this._renderer.createElement('div');
-    this._renderer.setStyle(this._wrapperElement, 'position', 'relative');
-    this._renderer.setStyle(this._wrapperElement, 'overflow', 'visible');
-
-    this._removeListenerFncs.push(
-      this._renderer.listen(this._wrapperElement, 'mouseenter', () => {
-        if (!this.disabled()) {
-          this._renderer.setStyle(this._wrapperElement, 'cursor', 'grab');
-        }
-      })
-    );
-
-    this._removeListenerFncs.push(
-      this._renderer.listen(this._wrapperElement, 'mouseleave', () => {
-        this._renderer.removeStyle(this._wrapperElement, 'cursor');
-      })
-    );
-  }
+  constructor() {}
 
   ngAfterViewInit(): void {
-    this.assignWrapperToElementRef();
     this.registerEventListeners();
-  }
-
-  private assignWrapperToElementRef(): void {
-    const element = this._elementRef.nativeElement;
-
-    const parent = this._renderer.parentNode(element);
-    this._renderer.insertBefore(parent, this._wrapperElement, element);
-    this._renderer.removeChild(parent, element);
-    this._renderer.appendChild(this._wrapperElement, element);
   }
 
   private registerEventListeners(): void {
@@ -93,6 +64,12 @@ export class DSwipe {
     let isSwiping = false;
     const isHorizontalSwipe = this.swipeOrientation() === 'horizontal';
     const isDisabled = this.disabled();
+    const element = this._elementRef.nativeElement;
+    /**
+     * @NOTE When use setPointerCapture, all the pointer event will return target as this._elementRef instead of its child wheather the child is clicked
+     * Therefore, store the true target before set pointer capture then invoke the click when pointer is up
+     */
+    let pointerDownTarget: EventTarget | null = null;
 
     const getPointerPosition = (event: PointerEvent) =>
       isHorizontalSwipe ? event.clientX : event.clientY;
@@ -103,13 +80,16 @@ export class DSwipe {
       const transform = isHorizontalSwipe
         ? `translateX(${distance}px)`
         : `translateY(${distance}px)`;
-      this._renderer.setStyle(this._wrapperElement, 'transform', transform);
+      this._renderer.setStyle(element, 'transform', transform);
     };
 
     const setStartPosition = (event: PointerEvent) => {
       start = getPointerPosition(event);
       isSwiping = true;
-      this._wrapperElement.setPointerCapture(event.pointerId);
+
+      pointerDownTarget = event.target;
+
+      element.setPointerCapture(event.pointerId);
 
       !isDisabled && this.swipeStart.emit();
     };
@@ -125,7 +105,7 @@ export class DSwipe {
     const resetPosition = (event: PointerEvent) => {
       if (!isSwiping) return;
       isSwiping = false;
-      this._wrapperElement.releasePointerCapture(event.pointerId);
+      element.releasePointerCapture(event.pointerId);
 
       const finalDelta = getPointerPosition(event) - start;
       applyTransform(0);
@@ -135,24 +115,31 @@ export class DSwipe {
         const direction = this.getSwipeDirection(finalDelta, isHorizontalSwipe);
         !isDisabled && this.swiped.emit(direction);
       }
+
+      //Invoke the true pointer target;
+      (pointerDownTarget as HTMLElement)?.click?.();
     };
 
     this._removeListenerFncs.push(
-      this._renderer.listen(
-        this._wrapperElement,
-        'pointerdown',
-        setStartPosition
-      )
+      this._renderer.listen(element, 'pointerdown', setStartPosition)
     );
     this._removeListenerFncs.push(
-      this._renderer.listen(
-        this._wrapperElement,
-        'pointermove',
-        setPositionByPointer
-      )
+      this._renderer.listen(element, 'pointermove', setPositionByPointer)
     );
     this._removeListenerFncs.push(
-      this._renderer.listen(this._wrapperElement, 'pointerup', resetPosition)
+      this._renderer.listen(element, 'pointerup', resetPosition)
+    );
+    this._removeListenerFncs.push(
+      this._renderer.listen(element, 'mouseenter', () => {
+        if (!this.disabled()) {
+          this._renderer.setStyle(element, 'cursor', 'grab');
+        }
+      })
+    );
+    this._removeListenerFncs.push(
+      this._renderer.listen(element, 'mouseleave', () => {
+        this._renderer.removeStyle(element, 'cursor');
+      })
     );
   }
 
