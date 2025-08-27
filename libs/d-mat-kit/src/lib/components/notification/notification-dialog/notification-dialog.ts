@@ -14,6 +14,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { NgTemplateOutlet } from '@angular/common';
 
+/**
+ * A modal dialog component used to display styled notifications with animated icons.
+ *
+ * This component is invoked by the `DNotification` service when calling `notify(...)`.
+ */
 @Component({
   selector: 'd-notification-dialog',
   imports: [
@@ -537,13 +542,30 @@ export class DNotificationDialog {
   });
   private readonly _config = inject(D_NOTIFICATION_CONFIG);
 
+  /** Title text to display in the notification dialog */
   readonly title: string;
+  /**
+   * CSS class list for styling the title based on the type of notification.
+   * Includes custom class (if provided) and default type class.
+   */
   readonly titleClassList: string;
+  /** Type of the notification: determines icon and styling (success, error, warn) */
   readonly type: DNotificationType;
+  /** Markdown-supported message content to be shown in the notification body */
   readonly message: string;
+  /** Label for the close button; defaults to 'Close' or value from `DNotificationIntl` */
   readonly buttonCloseLabel: string;
+  /** Label for the action button; resolved from action label, intl token, or default 'Confirm' */
   readonly buttonActionLabel: string;
+  /** Whether to show the close button; resolved from options or config */
   readonly showClose: boolean;
+  /**
+   * Configuration object for the optional action button or template.
+   * - `label`: Button label text
+   * - `callback`: Function to call when the button is clicked
+   * - `icon`: Optional icon to show
+   * - `template`: If provided, overrides default button with a custom `TemplateRef`
+   */
   readonly actionOptions:
     | {
         label?: string;
@@ -552,6 +574,10 @@ export class DNotificationDialog {
         template?: TemplateRef<any>;
       }
     | undefined;
+  /**
+   * Optional callback to invoke when the close button is clicked.
+   * Note: This does **not** fire when the dialog auto-closes.
+   */
   readonly closeCallback: (() => void) | undefined;
 
   constructor() {
@@ -570,7 +596,7 @@ export class DNotificationDialog {
       options.action?.label || this._intl?.buttonActionLabel || 'Confirm';
     this.showClose = !!(options.showClose ?? this._config.showClose);
     this.actionOptions = options.action;
-    this.closeCallback = options.onClose;
+    this.closeCallback = options.onCloseClick;
   }
 
   private getDefaultTitle(options: DNotificationOptions): string {

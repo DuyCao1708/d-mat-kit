@@ -4,6 +4,11 @@ import { provideMarkdown, MarkdownComponent } from 'ngx-markdown';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
+/**
+ * Component for displaying a toast message with icon, markdown-supported content, and close button.
+ *
+ * Used internally by the `DNotification` service when calling `toast(...)`.
+ */
 @Component({
   selector: 'd-toast',
   imports: [MarkdownComponent, MatIconModule, MatButtonModule],
@@ -57,23 +62,41 @@ import { MatButtonModule } from '@angular/material/button';
   providers: [provideMarkdown()],
 })
 export class Toast {
+  /** Required toast options. */
   options = input.required<DToastOptions>();
+  /**
+   * Emits an event when the close button is clicked.
+   * Used to remove the toast from the list.
+   */
   close = output<void>();
 
+  /** Dynamically binds background color based on the toast type. */
   @HostBinding('style.background-color') get getBackgroundColor() {
     return `var( --d-toast-${this.options().type}-container-color)`;
   }
 
+  /** Dynamically binds text color based on the toast type. */
   @HostBinding('style.color') get getTextColor() {
     return `var( --d-toast-${this.options().type}-text-color)`;
   }
 
+  /**
+   * Binds animation styles for slide-in and fade-out effects.
+   * Fade-out timing depends on `options.timeout`.
+   */
   @HostBinding('style.animation') get getAnimation() {
     return `dToastSlideInLeft ease 0.3s, dToastFadeOut linear 1s ${
       this.options().timeout
     }s forwards`;
   }
 
+  /**
+   * Returns the Material icon name based on the toast type.
+   *
+   * - success → check_circle
+   * - error → error
+   * - warn → warning
+   */
   get matFontIcon() {
     switch (this.options().type) {
       case 'success':

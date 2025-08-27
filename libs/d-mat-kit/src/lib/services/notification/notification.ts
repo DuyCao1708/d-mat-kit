@@ -12,20 +12,47 @@ import { DNotificationDialog } from '../../components/notification/notification-
 import { DToastDialog } from '../../components/notification/toast-dialog/toast-dialog';
 import { BehaviorSubject, take } from 'rxjs';
 import { DToastOptionsWithId } from '../../models/notification/toast-options-with-id';
+import { D_NOTIFICATION_CONFIG } from '../../tokens';
 
+/**
+ * Service to open notification dialogs.
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class DNotification {
+  /**
+   * Reference to the Angular Material dialog service.
+   * Used to open notification and toast dialogs.
+   */
   private readonly _dialog = inject(MatDialog);
+  /** List of current toast options (each with a unique ID). */
   private _toastsOptions: DToastOptionsWithId[] = [];
+  /** Observable stream of toast options used to update the toast dialog. */
   private readonly _toastsOptions$ = new BehaviorSubject<DToastOptionsWithId[]>(
     this._toastsOptions
   );
+  /**
+   * Reference to the currently opened toast dialog.
+   * Only one toast container dialog is used to manage all opened toast messages.
+   */
   private _toastDialogRef: MatDialogRef<DToastDialog> | null = null;
-  private readonly DEFAULT_TOAST_TIMEOUT = 5;
+  /**
+   * Default timeout for toast auto-dismiss (in seconds).
+   * Retrieved from global notification config.
+   */
+  private readonly DEFAULT_TOAST_TIMEOUT = inject(D_NOTIFICATION_CONFIG)
+    .toastTimeout;
+  /** Internal counter for generating unique toast IDs. */
   private _toastIdCounter = 0;
 
+  /**
+   * Opens a notification dialog.
+   *
+   * @param options {@link DNotificationOptions} - Notification configuration (message, type, title, etc.)
+   * @param config Optional Material dialog config overrides
+   * @returns A `MatDialogRef` to the opened notification dialog
+   */
   notify(
     options: DNotificationOptions,
     config?: MatDialogConfig
@@ -35,6 +62,13 @@ export class DNotification {
     return this._dialog.open(DNotificationDialog, dialogConfig);
   }
 
+  /**
+   * Displays a toast notification in a shared toast container dialog.
+   *
+   * @param options {@link DToastOptions} - Toast configuration (message, type, timeout, etc.)
+   * @param config Optional Material dialog config overrides
+   * @returns A `MatDialogRef` to the toast dialog
+   */
   toast(
     options: DToastOptions,
     config?: MatDialogConfig

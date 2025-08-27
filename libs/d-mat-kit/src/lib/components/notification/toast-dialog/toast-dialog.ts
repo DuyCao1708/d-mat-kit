@@ -5,6 +5,9 @@ import { Observable } from 'rxjs';
 import { Toast } from '../toast/toast';
 import { DToastOptionsWithId } from '../../../models/notification/toast-options-with-id';
 
+/**
+ * Component dialog container that renders a list of toast notifications.
+ */
 @Component({
   selector: 'd-toast-dialog',
   imports: [Toast],
@@ -19,10 +22,15 @@ import { DToastOptionsWithId } from '../../../models/notification/toast-options-
   `,
 })
 export class DToastDialog {
+  /**
+   * Signal wrapping an Observable array of toast options with IDs.
+   * Used to dynamically render the list of toasts.
+   */
   protected readonly toastsOptions = toSignal(
     inject(MAT_DIALOG_DATA) as Observable<DToastOptionsWithId[]>,
     { initialValue: [] }
   );
 
+  /** Emits the ID of the toast that requests to be closed. */
   close = output<number>();
 }
