@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { NgTemplateOutlet } from '@angular/common';
 import { DEFAULT_D_NOTIFICATION_INTL } from '../../../models/notification/default-notification-intl';
+import { DEFAULT_D_NOTIFICATION_CONFIG } from '../../../models/notification/default-notification-config';
 
 /**
  * A modal dialog component used to display styled notifications with animated icons.
@@ -597,7 +598,10 @@ export class DNotificationDialog {
       options.action?.label ||
       this._intl.buttonActionLabel ||
       DEFAULT_D_NOTIFICATION_INTL.buttonActionLabel;
-    this.showClose = !!(options.showClose ?? this._config.showClose);
+    this.showClose =
+      options.showClose ??
+      this._config.showClose ??
+      DEFAULT_D_NOTIFICATION_CONFIG.showClose;
     this.actionOptions = options.action;
     this.closeCallback = options.onCloseClick;
   }

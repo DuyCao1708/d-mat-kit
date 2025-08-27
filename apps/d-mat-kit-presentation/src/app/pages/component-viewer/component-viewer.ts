@@ -5,12 +5,11 @@ import { DNotification } from '@duycaotu/d-mat-kit';
 @Component({
   selector: 'component-viewer',
   imports: [MatButtonModule],
-  template: ` <ng-template #testTemplate><p>component-viewer works!</p></ng-template> `,
+  template: `<p>component-viewer works!</p>`,
   styles: ``,
 })
 export class ComponentViewer {
   private readonly _notification = inject(DNotification);
-  private readonly test = viewChild.required<TemplateRef<any>>('testTemplate')
 
   constructor() {
     // this._notification.notify({ type: 'warn', message: 'hehe' });

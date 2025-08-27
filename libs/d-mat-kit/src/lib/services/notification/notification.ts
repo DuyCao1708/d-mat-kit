@@ -13,6 +13,7 @@ import { DToastDialog } from '../../components/notification/toast-dialog/toast-d
 import { BehaviorSubject, take } from 'rxjs';
 import { DToastOptionsWithId } from '../../models/notification/toast-options-with-id';
 import { D_NOTIFICATION_CONFIG } from '../../tokens';
+import { DEFAULT_D_NOTIFICATION_CONFIG } from '../../models/notification/default-notification-config';
 
 /**
  * Service to open notification dialogs.
@@ -41,8 +42,9 @@ export class DNotification {
    * Default timeout for toast auto-dismiss (in seconds).
    * Retrieved from global notification config.
    */
-  private readonly DEFAULT_TOAST_TIMEOUT = inject(D_NOTIFICATION_CONFIG)
-    .toastTimeout;
+  private readonly DEFAULT_TOAST_TIMEOUT =
+    inject(D_NOTIFICATION_CONFIG).toastTimeout ??
+    DEFAULT_D_NOTIFICATION_CONFIG.toastTimeout;
   /** Internal counter for generating unique toast IDs. */
   private _toastIdCounter = 0;
 
