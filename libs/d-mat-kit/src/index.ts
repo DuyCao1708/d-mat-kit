@@ -1,2 +1,3 @@
 export * from './lib/services';
-export * from './lib/models/index';
+export * from './lib/models';
+export * from './lib/directives'
