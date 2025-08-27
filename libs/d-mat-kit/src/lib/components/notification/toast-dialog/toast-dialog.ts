@@ -16,6 +16,7 @@ import { DSwipe } from '../../../directives/swipe';
     @for(options of toastsOptions(); track options.id) {
     <d-toast
       d-swipeable
+      [disabled]="!options.swipeable"
       [threshold]="100"
       (swiped)="close.emit(options.id)"
       [options]="options"

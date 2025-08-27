@@ -22,30 +22,14 @@ import { DEFAULT_D_NOTIFICATION_CONFIG } from '../../models/notification/default
   providedIn: 'root',
 })
 export class DNotification {
-  /**
-   * Reference to the Angular Material dialog service.
-   * Used to open notification and toast dialogs.
-   */
   private readonly _dialog = inject(MatDialog);
-  /** List of current toast options (each with a unique ID). */
   private _toastsOptions: DToastOptionsWithId[] = [];
-  /** Observable stream of toast options used to update the toast dialog. */
   private readonly _toastsOptions$ = new BehaviorSubject<DToastOptionsWithId[]>(
     this._toastsOptions
   );
-  /**
-   * Reference to the currently opened toast dialog.
-   * Only one toast container dialog is used to manage all opened toast messages.
-   */
   private _toastDialogRef: MatDialogRef<DToastDialog> | null = null;
-  /**
-   * Default timeout for toast auto-dismiss (in seconds).
-   * Retrieved from global notification config.
-   */
-  private readonly DEFAULT_TOAST_TIMEOUT =
-    inject(D_NOTIFICATION_CONFIG).toastTimeout ??
-    DEFAULT_D_NOTIFICATION_CONFIG.toastTimeout;
-  /** Internal counter for generating unique toast IDs. */
+
+  private readonly _config = inject(D_NOTIFICATION_CONFIG);
   private _toastIdCounter = 0;
 
   /**
@@ -97,7 +81,9 @@ export class DNotification {
     const id = this.setToastOptionsToSubject(options);
     this.removeToastByTimeout(
       id,
-      options.timeout || this.DEFAULT_TOAST_TIMEOUT
+      options.timeout ??
+        this._config.toastTimeout ??
+        DEFAULT_D_NOTIFICATION_CONFIG.toastTimeout
     );
 
     return this._toastDialogRef;
@@ -124,11 +110,17 @@ export class DNotification {
     const id = ++this._toastIdCounter;
     this._toastsOptions.push({
       ...options,
-      timeout: options.timeout || this.DEFAULT_TOAST_TIMEOUT,
       id,
+      timeout:
+        options.timeout ??
+        this._config.toastTimeout ??
+        DEFAULT_D_NOTIFICATION_CONFIG.toastTimeout,
+      swipeable:
+        options.swipeable ??
+        this._config.swipeableToast ??
+        DEFAULT_D_NOTIFICATION_CONFIG.swipeableToast,
     });
     this._toastsOptions$.next(this._toastsOptions);
-    console.log(this._toastsOptions);
 
     return id;
   }

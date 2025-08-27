@@ -4,4 +4,5 @@ import { DNoticationConfig } from './notification-options';
 export const DEFAULT_D_NOTIFICATION_CONFIG: DNoticationConfig = {
   showClose: true,
   toastTimeout: 5,
+  swipeableToast: true
 };

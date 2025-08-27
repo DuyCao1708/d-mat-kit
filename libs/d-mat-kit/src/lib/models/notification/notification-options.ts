@@ -60,6 +60,11 @@ export type DToastOptions = {
    * If not provided, the default value from global config will be used.
    */
   timeout?: number;
+  /**
+   * Whether the user can close the toast using a swipe gesture.
+   * If not provided, the default value from global config will be used.
+   */
+  swipeable?: boolean;
 };
 
 /**
@@ -72,4 +77,6 @@ export type DNoticationConfig = {
   showClose: boolean;
   /** Duration (in seconds) before the toast automatically disappears. */
   toastTimeout: number;
+  /** Whether the user can close the toast using a swipe gesture. */
+  swipeableToast: boolean;
 };

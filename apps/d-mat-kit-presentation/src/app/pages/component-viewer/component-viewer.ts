@@ -17,7 +17,6 @@ export class ComponentViewer {
     this._notification.toast({
       type: 'success',
       message: 'hehe hehe *hehe* hehe hehe hehe',
-      timeout: 1000,
     });
   }
 }

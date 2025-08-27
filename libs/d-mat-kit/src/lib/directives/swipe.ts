@@ -6,6 +6,7 @@ import {
   output,
   Renderer2,
 } from '@angular/core';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 
 /** Defines allowed swipe orientations. */
 export type DSwipeOrientation = 'horizontal' | 'vertical';
@@ -31,6 +32,10 @@ export class DSwipe {
    * Default is 50.
    */
   swipeThreshold = input<number>(50, { alias: 'threshold' });
+  /** Whether the swipe gesture is disabled. */
+  disabled = input<boolean, boolean | string>(false, {
+    transform: (v) => coerceBooleanProperty(v),
+  });
   /** Emits the current swipe distance in pixels as the user is dragging. */
   swiping = output<number>();
   /** Emits when the user starts a swipe gesture. */
@@ -55,7 +60,9 @@ export class DSwipe {
 
     this._removeListenerFncs.push(
       this._renderer.listen(this._wrapperElement, 'mouseenter', () => {
-        this._renderer.setStyle(this._wrapperElement, 'cursor', 'grab');
+        if (!this.disabled()) {
+          this._renderer.setStyle(this._wrapperElement, 'cursor', 'grab');
+        }
       })
     );
 
@@ -85,11 +92,14 @@ export class DSwipe {
     let delta = 0;
     let isSwiping = false;
     const isHorizontalSwipe = this.swipeOrientation() === 'horizontal';
+    const isDisabled = this.disabled();
 
     const getPointerPosition = (event: PointerEvent) =>
       isHorizontalSwipe ? event.clientX : event.clientY;
 
     const applyTransform = (distance: number) => {
+      if (isDisabled) return;
+
       const transform = isHorizontalSwipe
         ? `translateX(${distance}px)`
         : `translateY(${distance}px)`;
@@ -100,7 +110,8 @@ export class DSwipe {
       start = getPointerPosition(event);
       isSwiping = true;
       this._wrapperElement.setPointerCapture(event.pointerId);
-      this.swipeStart.emit();
+
+      !isDisabled && this.swipeStart.emit();
     };
 
     const setPositionByPointer = (event: PointerEvent) => {
@@ -108,7 +119,7 @@ export class DSwipe {
 
       delta = getPointerPosition(event) - start;
       applyTransform(delta);
-      this.swiping.emit(delta);
+      !isDisabled && this.swiping.emit(delta);
     };
 
     const resetPosition = (event: PointerEvent) => {
@@ -118,11 +129,11 @@ export class DSwipe {
 
       const finalDelta = getPointerPosition(event) - start;
       applyTransform(0);
-      this.swipeEnd.emit();
+      !isDisabled && this.swipeEnd.emit();
 
       if (Math.abs(finalDelta) > this.swipeThreshold()) {
         const direction = this.getSwipeDirection(finalDelta, isHorizontalSwipe);
-        this.swiped.emit(direction);
+        !isDisabled && this.swiped.emit(direction);
       }
     };
 
