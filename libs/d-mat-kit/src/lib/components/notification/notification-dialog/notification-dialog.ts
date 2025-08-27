@@ -13,6 +13,7 @@ import { D_NOTIFICATION_CONFIG } from '../../../tokens';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { NgTemplateOutlet } from '@angular/common';
+import { DEFAULT_D_NOTIFICATION_INTL } from '../../../models/notification/default-notification-intl';
 
 /**
  * A modal dialog component used to display styled notifications with animated icons.
@@ -537,9 +538,7 @@ import { NgTemplateOutlet } from '@angular/common';
   providers: [provideMarkdown()],
 })
 export class DNotificationDialog {
-  private readonly _intl = inject(D_NOTIFICATION_INTL, {
-    optional: true,
-  });
+  private readonly _intl = inject(D_NOTIFICATION_INTL);
   private readonly _config = inject(D_NOTIFICATION_CONFIG);
 
   /** Title text to display in the notification dialog */
@@ -591,9 +590,13 @@ export class DNotificationDialog {
 
     this.type = options.type as DNotificationType;
     this.message = options.message;
-    this.buttonCloseLabel = this._intl?.buttonCloseLabel || 'Close';
+    this.buttonCloseLabel =
+      this._intl.buttonCloseLabel ||
+      DEFAULT_D_NOTIFICATION_INTL.buttonCloseLabel;
     this.buttonActionLabel =
-      options.action?.label || this._intl?.buttonActionLabel || 'Confirm';
+      options.action?.label ||
+      this._intl.buttonActionLabel ||
+      DEFAULT_D_NOTIFICATION_INTL.buttonActionLabel;
     this.showClose = !!(options.showClose ?? this._config.showClose);
     this.actionOptions = options.action;
     this.closeCallback = options.onCloseClick;
@@ -602,11 +605,13 @@ export class DNotificationDialog {
   private getDefaultTitle(options: DNotificationOptions): string {
     switch (options.type) {
       case DNotificationType.Success:
-        return this._intl?.titleSuccess || 'Success';
+        return (
+          this._intl.titleSuccess || DEFAULT_D_NOTIFICATION_INTL.titleSuccess
+        );
       case DNotificationType.Error:
-        return this._intl?.titleError || 'Error';
+        return this._intl.titleError || DEFAULT_D_NOTIFICATION_INTL.titleError;
       case DNotificationType.Warn:
-        return this._intl?.titleWarn || 'Warn';
+        return this._intl.titleWarn || DEFAULT_D_NOTIFICATION_INTL.titleWarn;
       default:
         return '';
     }
