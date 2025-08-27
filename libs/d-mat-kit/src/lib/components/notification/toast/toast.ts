@@ -31,7 +31,7 @@ import { MatButtonModule } from '@angular/material/button';
     `
       :host {
         position: relative;
-        width: 350px;
+        width: min(350px, 72vw);
         height: fit-content;
         max-width: 350px;
         display: flex;
@@ -61,7 +61,7 @@ import { MatButtonModule } from '@angular/material/button';
   ],
   providers: [provideMarkdown()],
 })
-export class Toast {
+export class DToast {
   /** Required toast options. */
   options = input.required<DToastOptions>();
   /**
