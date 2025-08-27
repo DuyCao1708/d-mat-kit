@@ -1,34 +1,56 @@
-import { Component, input } from '@angular/core';
-import { DToastOptions } from '../../../models';
+import { Component, HostBinding, input, output } from '@angular/core';
+import { DNotificationType, DToastOptions } from '../../../models';
 import { provideMarkdown, MarkdownComponent } from 'ngx-markdown';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'd-toast',
-  imports: [MarkdownComponent],
+  imports: [MarkdownComponent, MatIconModule, MatButtonModule],
   template: `
+    <mat-icon style="min-width: 24px">{{ matFontIcon }}</mat-icon>
+
     <markdown>
       {{ options().message }}
     </markdown>
+
+    <button
+      mat-icon-button
+      class="d-toast-button-icon-close"
+      (click)="close.emit()"
+    >
+      <mat-icon>clear</mat-icon>
+    </button>
   `,
   styles: [
     `
       :host {
-        width: fit-content;
+        position: relative;
+        width: 350px;
         height: fit-content;
-        min-width: 280px;
-        background-color: var(--mat-sys-error-container);
-        animation: slideInLeft ease 0.3s;
+        max-width: 350px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0px 40px 0px 16px;
+        margin-bottom: 4px;
+        border-radius: var(--d-toast-container-shape);
       }
 
-      @keyframes slideInLeft {
-        from {
-          opacity: 0;
-          transform: translateX(calc(100% + 16px)) scale(0);
+      .d-toast-button-icon-close {
+        position: absolute;
+        right: 12px;
+        top: 12px;
+        display: flex;
+        align-items: center;
+
+        mat-icon {
+          font-size: 1.125rem;
+          line-height: 1.5rem;
         }
-        to {
-          opacity: 1;
-          transform: translateX(0) scale(1);
-        }
+
+        --mat-icon-button-state-layer-size: 24px;
+        --mat-icon-color: var(--mat-sys-outline-variant);
       }
     `,
   ],
@@ -36,4 +58,33 @@ import { provideMarkdown, MarkdownComponent } from 'ngx-markdown';
 })
 export class Toast {
   options = input.required<DToastOptions>();
+  close = output<void>();
+
+  @HostBinding('style.background-color') get getBackgroundColor() {
+    return `var( --d-toast-${this.options().type}-container-color)`;
+  }
+
+  @HostBinding('style.color') get getTextColor() {
+    return `var( --d-toast-${this.options().type}-text-color)`;
+  }
+
+  @HostBinding('style.animation') get getAnimation() {
+    return `dToastSlideInLeft ease 0.3s, dToastFadeOut linear 1s ${
+      this.options().timeout
+    }s forwards`;
+  }
+
+  get matFontIcon() {
+    switch (this.options().type) {
+      case 'success':
+      case DNotificationType.Success:
+        return 'check_circle';
+      case 'error':
+      case DNotificationType.Error:
+        return 'error';
+      case 'warn':
+      case DNotificationType.Warn:
+        return 'warning';
+    }
+  }
 }

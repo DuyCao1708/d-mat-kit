@@ -16,9 +16,35 @@ export class ComponentViewer {
 
   constructor() {
     // this._notification.notify({ type: 'warn', message: 'hehe' });
+    this._notification.toast({
+      type: 'success',
+      message: 'hehe hehe *hehe* hehe hehe hehe',
+    });
+    this._notification.toast({
+      type: 'error',
+      message: 'hehe hehe *hehe* hehe hehe hehe',
+    });
+    this._notification.toast({
+      type: 'warn',
+      message: 'hehe hehe *hehe* hehe hehe hehe',
+    });
   }
 
   toast(): void {
-    this._notification.toast({ type: 'warn', message: 'hehe' });
+    this._notification.toast({
+      type: 'success',
+      message: `Đường dẫn đến phiếu thu *HD_123123123* đã được sao chép`,
+      timeout: 1000,
+    });
+    this._notification.toast({
+      type: 'error',
+      message: 'hehe hehe *hehe* hehe hehe hehe',
+      timeout: 2,
+    });
+    this._notification.toast({
+      type: 'warn',
+      message: 'hehe hehe *hehe* hehe hehe hehe',
+      timeout: 2,
+    });
   }
 }
