@@ -86,8 +86,8 @@ export class DSwipe {
     let isSwiping = false;
     const isHorizontalSwipe = this.swipeOrientation() === 'horizontal';
 
-    const getPointerPosition = (e: PointerEvent) =>
-      isHorizontalSwipe ? e.clientX : e.clientY;
+    const getPointerPosition = (event: PointerEvent) =>
+      isHorizontalSwipe ? event.clientX : event.clientY;
 
     const applyTransform = (distance: number) => {
       const transform = isHorizontalSwipe
