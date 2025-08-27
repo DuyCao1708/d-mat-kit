@@ -1,3 +1,5 @@
+import { TemplateRef } from '@angular/core';
+
 export enum DNotificationType {
   Error = 'error',
   Success = 'success',
@@ -9,6 +11,14 @@ export type DNotificationOptions = {
   message: string;
   title?: string;
   titleClass?: string;
+  action?: {
+    label?: string;
+    callback?: () => void;
+    icon?: string;
+    template?: TemplateRef<any>;
+  };
+  onClose?: () => void;
+  showClose?: boolean;
 };
 
 export type DToastOptions = {
@@ -17,3 +27,9 @@ export type DToastOptions = {
   toastClass?: string;
   timeout?: number;
 };
+
+export type DNoticationConfig = {
+  showClose: boolean;
+}
+
+

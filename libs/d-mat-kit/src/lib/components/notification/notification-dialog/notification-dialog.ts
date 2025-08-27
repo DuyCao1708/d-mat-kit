@@ -1,16 +1,31 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, TemplateRef } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogClose,
   MatDialogContent,
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { DNotificationOptions, DNotificationType } from '../../../models';
-import { NOTIFICATION_INTL } from '../../../tokens/d-mat-kit-intl';
+import { D_NOTIFICATION_INTL } from '../../../tokens/d-mat-kit-intl';
 import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
+import { D_NOTIFICATION_CONFIG } from '../../../tokens';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
   selector: 'd-notification-dialog',
-  imports: [MatDialogTitle, MatDialogContent, MarkdownComponent],
+  imports: [
+    MatDialogTitle,
+    MatDialogContent,
+    MarkdownComponent,
+    MatDialogActions,
+    MatDialogClose,
+    MatButtonModule,
+    MatIconModule,
+    NgTemplateOutlet,
+  ],
   template: `
     <h2 mat-dialog-title class="d-notification-title" [class]="titleClassList">
       {{ title }}
@@ -54,6 +69,34 @@ import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
         </markdown>
       </section>
     </mat-dialog-content>
+
+    @if (showClose || actionOptions) {
+    <mat-dialog-actions>
+      @if (showClose) {
+      <button matButton mat-dialog-close (click)="closeCallback?.()">
+        {{ buttonCloseLabel }}
+      </button>
+      }
+
+      <!--prettier-ignore-->
+      @if (actionOptions) {
+      @if (actionOptions.template) {
+      <ng-container *ngTemplateOutlet="actionOptions.template"></ng-container>
+      } @else {
+      <button
+        matButton
+        mat-dialog-close
+        (click)="actionOptions.callback?.()"
+        cdkFocusInitial
+      >
+        @if (actionOptions.icon) {
+        <mat-icon>{{ actionOptions.icon }}</mat-icon>
+        }
+        {{ buttonActionLabel }}
+      </button>
+      } }
+    </mat-dialog-actions>
+    }
   `,
   styles: [
     `
@@ -489,17 +532,30 @@ import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
   providers: [provideMarkdown()],
 })
 export class DNotificationDialog {
-  private readonly _notificationIntl = inject(NOTIFICATION_INTL, {
+  private readonly _intl = inject(D_NOTIFICATION_INTL, {
     optional: true,
   });
+  private readonly _config = inject(D_NOTIFICATION_CONFIG);
 
   readonly title: string;
   readonly titleClassList: string;
   readonly type: DNotificationType;
   readonly message: string;
+  readonly buttonCloseLabel: string;
+  readonly buttonActionLabel: string;
+  readonly showClose: boolean;
+  readonly actionOptions:
+    | {
+        label?: string;
+        callback?: () => void;
+        icon?: string;
+        template?: TemplateRef<any>;
+      }
+    | undefined;
+  readonly closeCallback: (() => void) | undefined;
 
   constructor() {
-    const options = inject(MAT_DIALOG_DATA);
+    const options = inject(MAT_DIALOG_DATA) as DNotificationOptions;
 
     this.title = options.title || this.getDefaultTitle(options);
     this.titleClassList = [
@@ -507,18 +563,24 @@ export class DNotificationDialog {
       `d-notification-title-${options.type}`,
     ].join(' ');
 
-    this.type = options.type;
+    this.type = options.type as DNotificationType;
     this.message = options.message;
+    this.buttonCloseLabel = this._intl?.buttonCloseLabel || 'Close';
+    this.buttonActionLabel =
+      options.action?.label || this._intl?.buttonActionLabel || 'Confirm';
+    this.showClose = !!(options.showClose ?? this._config.showClose);
+    this.actionOptions = options.action;
+    this.closeCallback = options.onClose;
   }
 
   private getDefaultTitle(options: DNotificationOptions): string {
     switch (options.type) {
       case DNotificationType.Success:
-        return this._notificationIntl?.titleSuccess || 'Success';
+        return this._intl?.titleSuccess || 'Success';
       case DNotificationType.Error:
-        return this._notificationIntl?.titleError || 'Error';
+        return this._intl?.titleError || 'Error';
       case DNotificationType.Warn:
-        return this._notificationIntl?.titleWarn || 'Warn';
+        return this._intl?.titleWarn || 'Warn';
       default:
         return '';
     }
