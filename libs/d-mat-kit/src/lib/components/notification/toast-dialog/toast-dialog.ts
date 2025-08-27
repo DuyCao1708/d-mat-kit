@@ -2,18 +2,22 @@ import { Component, inject, output } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
-import { Toast } from '../toast/toast';
+import { DToast } from '../toast/toast';
 import { DToastOptionsWithId } from '../../../models/notification/toast-options-with-id';
+import { DSwipe } from '../../../directives/swipe';
 
 /**
  * Component dialog container that renders a list of toast notifications.
  */
 @Component({
   selector: 'd-toast-dialog',
-  imports: [Toast],
+  imports: [DToast, DSwipe],
   template: `
     @for(options of toastsOptions(); track options.id) {
     <d-toast
+      d-swipeable
+      [threshold]="100"
+      (swiped)="close.emit(options.id)"
       [options]="options"
       [class]="options.toastClass"
       (close)="close.emit(options.id)"
