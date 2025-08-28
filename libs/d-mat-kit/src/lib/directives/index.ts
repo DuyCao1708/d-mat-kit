@@ -1,2 +1,2 @@
 export * from './swipe';
-export * from './popover';
+export * from './popover-trigger';

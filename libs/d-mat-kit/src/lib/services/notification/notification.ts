@@ -74,8 +74,8 @@ export class DNotification {
     if (!this._toastDialogRef) {
       this._toastDialogRef = this._dialog.open(DToastDialog, dialogConfig);
 
-      this.registerToastDialogRefResetOnClose();
-      this.registerRemovalOnToastClose();
+      this.listenToDialogClose();
+      this.listenToToastClose();
     }
 
     const id = this.setToastOptionsToSubject(options);
@@ -89,7 +89,7 @@ export class DNotification {
     return this._toastDialogRef;
   }
 
-  private registerRemovalOnToastClose(): void {
+  private listenToToastClose(): void {
     this._toastDialogRef!.componentInstance.close.subscribe((id: number) =>
       this.removeToast(id)
     );
@@ -125,7 +125,7 @@ export class DNotification {
     return id;
   }
 
-  private registerToastDialogRefResetOnClose(): void {
+  private listenToDialogClose(): void {
     this._toastDialogRef!.afterClosed()
       .pipe(take(1))
       .subscribe(() => (this._toastDialogRef = null));
