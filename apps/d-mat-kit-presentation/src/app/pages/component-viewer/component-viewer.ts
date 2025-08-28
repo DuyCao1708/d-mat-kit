@@ -1,29 +1,44 @@
-import { Component, inject, TemplateRef, viewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { DNotification } from '@duycaotu/d-mat-kit';
-import { DSwipe } from 'libs/d-mat-kit/src/lib/directives/swipe';
+import { MatMenuModule } from '@angular/material/menu';
+import { DPopoverTrigger } from '@duycaotu/d-mat-kit';
 
 @Component({
   selector: 'component-viewer',
-  imports: [MatButtonModule, DSwipe],
-  template: `<p d-swipeable>component-viewer works!</p>`,
+  imports: [MatButtonModule, MatMenuModule, DPopoverTrigger],
+  template: `
+    <p>component-viewer works!</p>
+
+    <button
+      matButton
+      #menuTrigger="matMenuTrigger"
+      [matMenuTriggerFor]="menuRed"
+      d-popover-trigger-for
+    >
+      popover trigger red
+    </button>
+
+    <mat-menu #menuRed>
+      <div style="width: 300px; height: 300px; background-color: red"></div>
+    </mat-menu>
+
+    <button
+      matButton
+      [matMenuTriggerFor]="menuGreen"
+      d-popover-trigger-for
+      closeOnClick="false"
+    >
+      popover trigger green
+    </button>
+
+    <mat-menu #menuGreen>
+      <div
+        class="p-2 rounded-lg shadow-md z-10 bg-[var(--mat-sys-surface)] text-xs w-full"
+      >
+        <p><span class="me-1 after:content-[':']">Tồn kho</span>100,000</p>
+      </div>
+    </mat-menu>
+  `,
   styles: ``,
 })
-export class ComponentViewer {
-  private readonly _notification = inject(DNotification);
-
-  constructor() {
-    // this._notification.notify({ type: 'warn', message: 'hehe' });
-    this._notification.toast({
-      type: 'success',
-      message: 'hehe hehe *hehe* hehe hehe hehe',
-      timeout: 1000
-    });
-    
-    this._notification.toast({
-      type: 'error',
-      message: 'hehe hehe *hehe* hehe hehe hehe',
-      timeout: 1000
-    });
-  }
-}
+export class ComponentViewer {}

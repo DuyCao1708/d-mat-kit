@@ -50,7 +50,7 @@ export class DSwipe {
 
   private readonly _elementRef = inject(ElementRef);
   private readonly _renderer = inject(Renderer2);
-  private readonly _removeListenerFncs: (() => void)[] = [];
+  private readonly _removeListenerFns: (() => void)[] = [];
 
   constructor() {}
 
@@ -120,23 +120,23 @@ export class DSwipe {
       (pointerDownTarget as HTMLElement)?.click?.();
     };
 
-    this._removeListenerFncs.push(
+    this._removeListenerFns.push(
       this._renderer.listen(element, 'pointerdown', setStartPosition)
     );
-    this._removeListenerFncs.push(
+    this._removeListenerFns.push(
       this._renderer.listen(element, 'pointermove', setPositionByPointer)
     );
-    this._removeListenerFncs.push(
+    this._removeListenerFns.push(
       this._renderer.listen(element, 'pointerup', resetPosition)
     );
-    this._removeListenerFncs.push(
+    this._removeListenerFns.push(
       this._renderer.listen(element, 'mouseenter', () => {
         if (!this.disabled()) {
           this._renderer.setStyle(element, 'cursor', 'grab');
         }
       })
     );
-    this._removeListenerFncs.push(
+    this._removeListenerFns.push(
       this._renderer.listen(element, 'mouseleave', () => {
         this._renderer.removeStyle(element, 'cursor');
       })
@@ -155,6 +155,6 @@ export class DSwipe {
   }
 
   ngOnDestroy(): void {
-    this._removeListenerFncs.forEach((fn) => fn());
+    this._removeListenerFns.forEach((fn) => fn());
   }
 }
