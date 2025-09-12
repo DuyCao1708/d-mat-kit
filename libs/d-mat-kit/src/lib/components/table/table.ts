@@ -306,6 +306,7 @@ export class DCellBinding {
           *matCellDef="let row; dataIndex as dataIndex"
           [attr.colspan]="columnsNames().length"
           class="d-table-expandable-cell"
+            [class.d-table-expandable-cell-sticky]="_expandableRowDef.sticky()"
           [class]="_expandableRowDef.classList()"
         >
           <div
@@ -407,6 +408,10 @@ export class DCellBinding {
         padding-left: 0;
         padding-right: 0;
         border-bottom: 0;
+      }
+      
+      .d-table-expandable-cell-sticky {
+        overflow: visible;
       }
 
       .d-table-expandable-template-wrapper {
