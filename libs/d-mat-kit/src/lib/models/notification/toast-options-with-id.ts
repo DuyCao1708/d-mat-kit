@@ -1,4 +1,4 @@
-import { DToastOptions } from './notification-options';
+import { DToastOptions } from '.';
 
 /** Extended toast options that include an ID for managing toast lifecycle */
 export type DToastOptionsWithId = DToastOptions & {

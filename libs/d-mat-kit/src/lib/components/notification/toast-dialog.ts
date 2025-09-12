@@ -2,9 +2,9 @@ import { Component, inject, output } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
-import { DToast } from '../toast/toast';
-import { DToastOptionsWithId } from '../../../models/notification/toast-options-with-id';
-import { DSwipe } from '../../../directives/swipe';
+import { DToast } from './toast';
+import { DToastOptionsWithId } from '../../models/notification/toast-options-with-id';
+import { DSwipe } from '../../directives/swipe';
 
 /**
  * Component dialog container that renders a list of toast notifications.

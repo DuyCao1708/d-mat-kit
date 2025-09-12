@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
-import { DPopoverTrigger } from '@duycaotu/d-mat-kit';
+import { DNotification, DPopoverTrigger } from '@duycaotu/d-mat-kit';
 
 @Component({
   selector: 'component-viewer',
@@ -41,4 +41,8 @@ import { DPopoverTrigger } from '@duycaotu/d-mat-kit';
   `,
   styles: ``,
 })
-export class ComponentViewer {}
+export class ComponentViewer {
+  constructor() {
+    inject(DNotification).toast({ type: 'warn', message: 'heheheh' });
+  }
+}

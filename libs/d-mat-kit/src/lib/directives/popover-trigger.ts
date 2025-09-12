@@ -45,8 +45,8 @@ export class DPopoverTrigger {
 
   private readonly _elementRef = inject(ElementRef);
 
-  private get _matMenu(): MatMenu {
-    return this.matMenuTrigger().menu as MatMenu;
+  private get _matMenu() {
+    return this.matMenuTrigger().menu as MatMenu | null;
   }
 
   private readonly _renderer = inject(Renderer2);
@@ -96,7 +96,10 @@ export class DPopoverTrigger {
     const element = this._elementRef.nativeElement;
     const triggerElement = (this.matMenuTrigger() as any)._element
       .nativeElement;
-    const menuPanelId = this._matMenu.panelId;
+    const menuPanelId = this._matMenu?.panelId;
+
+    if (!menuPanelId) return;
+
     const menuPanel = document.querySelector(`#${CSS.escape(menuPanelId)}`);
 
     if (!menuPanel || !element) return;
@@ -113,12 +116,15 @@ export class DPopoverTrigger {
   }
 
   private disableMenuBackdrop(): void {
-    this._matMenu.hasBackdrop = false;
+    if (this._matMenu) this._matMenu.hasBackdrop = false;
   }
 
   private listenToMenuOpen(): void {
     this.matMenuTrigger().menuOpened.subscribe(() => {
-      const menuPanelId = this._matMenu.panelId;
+      const menuPanelId = this._matMenu?.panelId;
+
+      if (!menuPanelId) return;
+
       const menuPanel = document.querySelector(`#${CSS.escape(menuPanelId)}`);
 
       if (!menuPanel) return;
@@ -153,6 +159,8 @@ export class DPopoverTrigger {
   }
 
   private configureOverlayClose(): void {
+    if (!this._matMenu) return;
+
     const menuClosed = this._matMenu.closed as Subject<any>;
     const closedEmitter = new EventEmitter();
     closedEmitter

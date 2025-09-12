@@ -67,16 +67,28 @@ export type DToastOptions = {
   swipeable?: boolean;
 };
 
-/**
- * Global configuration for DNotification service.
- *
- * Can be overridden using Angular dependency injection.
- */
-export type DNoticationConfig = {
+/** Global options for DNotification service. */
+export type DNofiticationGlobalOptions = {
   /** Whether to display a close button in the notification. */
   showClose: boolean;
   /** Duration (in seconds) before the toast automatically disappears. */
   toastTimeout: number;
   /** Whether the user can close the toast using a swipe gesture. */
   swipeableToast: boolean;
+};
+
+/**
+ * Internationalization (i18n) labels used by the notification components.
+ */
+export type DNotificationIntl = {
+  /** Default title for 'error'-type notifications. */
+  titleError: string;
+  /** Default title for 'success'-type notifications. */
+  titleSuccess: string;
+  /** Default title for 'warn'-type notifications. */
+  titleWarn: string;
+  /** Label for the close button in the dialog notification. */
+  buttonCloseLabel: string;
+  /** Label for the default action button in the dialog notification. */
+  buttonActionLabel: string;
 };

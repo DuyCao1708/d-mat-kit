@@ -1,5 +1,5 @@
 import { Component, HostBinding, input, output } from '@angular/core';
-import { DNotificationType, DToastOptions } from '../../../models';
+import { DNotificationType, DToastOptions } from '../../models';
 import { provideMarkdown, MarkdownComponent } from 'ngx-markdown';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -31,14 +31,14 @@ import { MatButtonModule } from '@angular/material/button';
     `
       :host {
         position: relative;
-        width: min(350px, 72vw);
+        width: min(380px, 72vw);
         height: fit-content;
-        max-width: 350px;
+        max-width: 380px;
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 0px 40px 0px 16px;
-        margin-bottom: 4px;
+        padding: 12px 40px 12px 16px;
+        margin-bottom: 12px;
         border-radius: var(--d-toast-container-shape);
       }
 
@@ -54,7 +54,7 @@ import { MatButtonModule } from '@angular/material/button';
           line-height: 1.5rem;
         }
 
-        --mat-icon-button-state-layer-size: 24px;
+        --mdc-icon-button-state-layer-size: 24px;
         --mat-icon-color: var(--mat-sys-outline-variant);
       }
     `,

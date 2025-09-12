@@ -6,15 +6,13 @@ import {
   MatDialogContent,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { DNotificationOptions, DNotificationType } from '../../../models';
-import { D_NOTIFICATION_INTL } from '../../../tokens/d-mat-kit-intl';
+import { DNotificationOptions, DNotificationType } from '../../models';
+import { NOTIFICATION_INTL } from '../../tokens/intl';
 import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
-import { D_NOTIFICATION_CONFIG } from '../../../tokens';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { NgTemplateOutlet } from '@angular/common';
-import { DEFAULT_D_NOTIFICATION_INTL } from '../../../models/notification/default-notification-intl';
-import { DEFAULT_D_NOTIFICATION_CONFIG } from '../../../models/notification/default-notification-config';
+import { NOTIFICATION_OPTIONS } from '../../tokens/config';
 
 /**
  * A modal dialog component used to display styled notifications with animated icons.
@@ -539,8 +537,8 @@ import { DEFAULT_D_NOTIFICATION_CONFIG } from '../../../models/notification/defa
   providers: [provideMarkdown()],
 })
 export class DNotificationDialog {
-  private readonly _intl = inject(D_NOTIFICATION_INTL);
-  private readonly _config = inject(D_NOTIFICATION_CONFIG);
+  private readonly _intl = inject(NOTIFICATION_INTL);
+  private readonly _defaultOptions = inject(NOTIFICATION_OPTIONS);
 
   /** Title text to display in the notification dialog */
   readonly title: string;
@@ -591,17 +589,10 @@ export class DNotificationDialog {
 
     this.type = options.type as DNotificationType;
     this.message = options.message;
-    this.buttonCloseLabel =
-      this._intl.buttonCloseLabel ||
-      DEFAULT_D_NOTIFICATION_INTL.buttonCloseLabel;
+    this.buttonCloseLabel = this._intl.buttonCloseLabel;
     this.buttonActionLabel =
-      options.action?.label ||
-      this._intl.buttonActionLabel ||
-      DEFAULT_D_NOTIFICATION_INTL.buttonActionLabel;
-    this.showClose =
-      options.showClose ??
-      this._config.showClose ??
-      DEFAULT_D_NOTIFICATION_CONFIG.showClose;
+      options.action?.label || this._intl.buttonActionLabel;
+    this.showClose = options.showClose ?? this._defaultOptions.showClose;
     this.actionOptions = options.action;
     this.closeCallback = options.onCloseClick;
   }
@@ -609,13 +600,11 @@ export class DNotificationDialog {
   private getDefaultTitle(options: DNotificationOptions): string {
     switch (options.type) {
       case DNotificationType.Success:
-        return (
-          this._intl.titleSuccess || DEFAULT_D_NOTIFICATION_INTL.titleSuccess
-        );
+        return this._intl.titleSuccess;
       case DNotificationType.Error:
-        return this._intl.titleError || DEFAULT_D_NOTIFICATION_INTL.titleError;
+        return this._intl.titleError;
       case DNotificationType.Warn:
-        return this._intl.titleWarn || DEFAULT_D_NOTIFICATION_INTL.titleWarn;
+        return this._intl.titleWarn;
       default:
         return '';
     }

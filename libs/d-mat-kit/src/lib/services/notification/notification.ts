@@ -7,13 +7,12 @@ import {
 import {
   DNotificationOptions,
   DToastOptions,
-} from '../../models/notification/notification-options';
-import { DNotificationDialog } from '../../components/notification/notification-dialog/notification-dialog';
-import { DToastDialog } from '../../components/notification/toast-dialog/toast-dialog';
+} from '../../models/notification';
 import { BehaviorSubject, take } from 'rxjs';
 import { DToastOptionsWithId } from '../../models/notification/toast-options-with-id';
-import { D_NOTIFICATION_CONFIG } from '../../tokens';
-import { DEFAULT_D_NOTIFICATION_CONFIG } from '../../models/notification/default-notification-config';
+import { NOTIFICATION_OPTIONS } from '../../tokens/config';
+import { DToastDialog } from '../../components/notification/toast-dialog';
+import { DNotificationDialog } from '../../components/notification/notification-dialog';
 
 /**
  * Service to open notification dialogs.
@@ -29,7 +28,7 @@ export class DNotification {
   );
   private _toastDialogRef: MatDialogRef<DToastDialog> | null = null;
 
-  private readonly _config = inject(D_NOTIFICATION_CONFIG);
+  private readonly _defaultOptions = inject(NOTIFICATION_OPTIONS);
   private _toastIdCounter = 0;
 
   /**
@@ -81,9 +80,7 @@ export class DNotification {
     const id = this.setToastOptionsToSubject(options);
     this.removeToastByTimeout(
       id,
-      options.timeout ??
-        this._config.toastTimeout ??
-        DEFAULT_D_NOTIFICATION_CONFIG.toastTimeout
+      options.timeout ?? this._defaultOptions.toastTimeout
     );
 
     return this._toastDialogRef;
@@ -111,14 +108,8 @@ export class DNotification {
     this._toastsOptions.push({
       ...options,
       id,
-      timeout:
-        options.timeout ??
-        this._config.toastTimeout ??
-        DEFAULT_D_NOTIFICATION_CONFIG.toastTimeout,
-      swipeable:
-        options.swipeable ??
-        this._config.swipeableToast ??
-        DEFAULT_D_NOTIFICATION_CONFIG.swipeableToast,
+      timeout: options.timeout ?? this._defaultOptions.toastTimeout,
+      swipeable: options.swipeable ?? this._defaultOptions.swipeableToast,
     });
     this._toastsOptions$.next(this._toastsOptions);
 
