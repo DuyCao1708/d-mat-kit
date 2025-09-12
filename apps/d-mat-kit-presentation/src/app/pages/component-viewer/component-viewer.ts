@@ -52,6 +52,6 @@ import {
 })
 export class ComponentViewer {
   constructor() {
-    inject(DNotification).toast({ type: 'warn', message: 'heheheh' });
+    inject(DNotification).toast({ type: 'warn', message: 'heheheh', timeout: 1000 });
   }
 }

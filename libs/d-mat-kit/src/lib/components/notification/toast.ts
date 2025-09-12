@@ -31,9 +31,9 @@ import { MatButtonModule } from '@angular/material/button';
     `
       :host {
         position: relative;
-        width: min(380px, 72vw);
+        width: min(var(--d-toast-container-width), 72vw);
         height: fit-content;
-        max-width: 380px;
+        max-width: var(--d-toast-container-width);
         display: flex;
         align-items: center;
         gap: 12px;
