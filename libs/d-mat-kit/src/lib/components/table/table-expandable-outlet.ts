@@ -94,8 +94,6 @@ export class DTableExpandableOutlet<T> {
 
             this._viewContainerRef.clear();
             this._viewRef = null;
-
-            this._renderer.removeStyle(this._hostElement, 'opacity');
           }
         };
 
