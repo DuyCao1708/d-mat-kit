@@ -54,6 +54,7 @@ import { MatButtonModule } from '@angular/material/button';
           line-height: 1.5rem;
         }
 
+        --mat-icon-button-state-layer-size: 24px;
         --mdc-icon-button-state-layer-size: 24px;
         --mat-icon-color: var(--mat-sys-outline-variant);
       }

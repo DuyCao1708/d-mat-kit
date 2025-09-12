@@ -1,10 +1,17 @@
 import { makeEnvironmentProviders, Provider } from '@angular/core';
-import { DNofiticationGlobalOptions, DNotificationIntl } from '../models';
-import { NOTIFICATION_OPTIONS } from './config';
-import { NOTIFICATION_INTL } from './intl';
+import {
+  DNofiticationGlobalOptions,
+  DNotificationIntl,
+  DTableIntl,
+  DTableOptions,
+  PartialDTableOptions,
+} from '../models';
+import { NOTIFICATION_OPTIONS, TABLE_OPTIONS } from './config';
+import { NOTIFICATION_INTL, TABLE_INTL } from './intl';
 
 enum DMatKitFeatureKind {
   Notification = 0,
+  Table = 1,
 }
 
 interface DMatKitFeature<KindT extends DMatKitFeatureKind> {
@@ -58,6 +65,81 @@ export const withNotification = (
 
   return {
     kind: DMatKitFeatureKind.Notification,
+    providers: providers,
+  };
+};
+//#endregion
+
+//#region Table
+/** Default table internationalization */
+const DEFAULT_TABLE_INTL: DTableIntl = {
+  noDataRow: 'No entries found',
+};
+
+const DEFAULT_TABLE_OPTIONS: DTableOptions = {
+  stickyDefaultHeaderRow: false,
+  expandIfSingleRow: true,
+  expandableRow: {
+    sticky: true,
+    columnName: 'expandedDetail',
+  },
+  column: {
+    dataAccessor: (data: any, name: string) => {
+      const _data = data as any;
+      const properties = name.split('.');
+
+      const textValue = properties.reduce((currentValue, nestedProperty) => {
+        currentValue = currentValue?.[nestedProperty];
+        return currentValue;
+      }, _data);
+
+      return textValue;
+    },
+
+    sort: {
+      arrowPosition: 'after',
+      disableClear: false,
+      disabled: true,
+      id: '',
+      sortActionDescription: 'Apply sort to this column',
+      start: '',
+    },
+
+    justify: 'start',
+  },
+};
+
+/** Configures the table feature with options and internationalization. */
+export const withTable = (
+  config?: Partial<{
+    intl: Partial<DTableIntl>;
+    options: PartialDTableOptions;
+  }>
+): DMatKitFeature<DMatKitFeatureKind> => {
+  const providers = [];
+
+  providers.push({
+    provide: TABLE_INTL,
+    useValue: { ...DEFAULT_TABLE_INTL, ...config?.intl },
+  });
+
+  const tableOptions = { ...DEFAULT_TABLE_OPTIONS, ...config?.options };
+  tableOptions.column = {
+    ...DEFAULT_TABLE_OPTIONS.column,
+    ...config?.options?.column,
+  };
+  tableOptions.expandableRow = {
+    ...DEFAULT_TABLE_OPTIONS.expandableRow,
+    ...config?.options?.expandableRow,
+  };
+
+  providers.push({
+    provide: TABLE_OPTIONS,
+    useValue: tableOptions,
+  });
+
+  return {
+    kind: DMatKitFeatureKind.Table,
     providers: providers,
   };
 };
