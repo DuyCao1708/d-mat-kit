@@ -1,11 +1,15 @@
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
-import { DNotification, DPopoverTrigger } from '@duycaotu/d-mat-kit';
+import {
+  DNotification,
+  DPopoverTrigger,
+  DTableModule,
+} from '@duycaotu/d-mat-kit';
 
 @Component({
   selector: 'component-viewer',
-  imports: [MatButtonModule, MatMenuModule, DPopoverTrigger],
+  imports: [MatButtonModule, MatMenuModule, DPopoverTrigger, DTableModule],
   template: `
     <p>component-viewer works!</p>
 
@@ -38,6 +42,11 @@ import { DNotification, DPopoverTrigger } from '@duycaotu/d-mat-kit';
         <p><span class="me-1 after:content-[':']">Tồn kho</span>100,000</p>
       </div>
     </mat-menu>
+
+    <d-table
+      [columns]="[{ name: 'column1', header: ' hehe' }]"
+      [dataSource]="[{ column1: '1231231' }]"
+    ></d-table>
   `,
   styles: ``,
 })

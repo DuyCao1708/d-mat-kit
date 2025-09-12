@@ -45,7 +45,7 @@ export class DTableExpandableOutlet<T> {
     transform: (value: string | boolean) => coerceBooleanProperty(value),
   });
 
-  private _resizeObserver: ResizeObserver;
+  private _resizeObserver: ResizeObserver | null = null;
   private _table = inject(DTable);
 
   /**
@@ -72,7 +72,7 @@ export class DTableExpandableOutlet<T> {
       } else {
         renderer.removeStyle(hostElement, 'width');
 
-        this._resizeObserver.disconnect();
+        this._resizeObserver?.disconnect();
       }
     });
   }
