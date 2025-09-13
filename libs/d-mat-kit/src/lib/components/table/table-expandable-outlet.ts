@@ -12,6 +12,8 @@ import {
 } from '@angular/core';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { DTable } from './table';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { distinctUntilChanged } from 'rxjs';
 
 /**
  * Responsible for rendering the content of an expandable row inside a {@link DTable}.
@@ -67,17 +69,23 @@ export class DTableExpandableOutlet<T> {
     else return ['position: sticky', 'left: 0'].join('; ');
   }
 
+  private readonly _isExpanded$ = toObservable(this.expanded).pipe(
+    takeUntilDestroyed(),
+    distinctUntilChanged()
+  );
+
   constructor() {
-    this.setupExpansionEffect();
     this.setupResizeEffect();
   }
 
-  private setupExpansionEffect() {
+  ngAfterViewInit(): void {
+    this.listenToExpansionState();
+  }
+
+  private listenToExpansionState() {
     let removeListenerFn: (() => void) | null = null;
 
-    effect(() => {
-      const isExpanded = this.expanded();
-
+    this._isExpanded$.subscribe((isExpanded) => {
       if (isExpanded) {
         removeListenerFn?.();
         this._renderer.setStyle(this._hostElement, 'opacity', '1');
