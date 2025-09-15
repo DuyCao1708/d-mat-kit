@@ -33,7 +33,7 @@ import { distinctUntilChanged } from 'rxjs';
       :host {
         display: block;
         min-height: 0;
-        overflow:hidden;
+        overflow: hidden;
         transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1);
       }
     `,
