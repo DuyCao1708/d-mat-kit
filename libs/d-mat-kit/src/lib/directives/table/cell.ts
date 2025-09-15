@@ -82,7 +82,7 @@ export abstract class DStaticInputsCellDef implements DTableCellDef<never> {
 abstract class DStaticInputsCell {
   private readonly _defaultOptions = inject(TABLE_OPTIONS);
 
-  /** The name of the column that this cell belongs to. */
+   /** Cell's class attribute value */
   abstract classList: InputSignalWithTransform<string[], string | string[]>;
 
   /** Cell's colspan attribute value */
