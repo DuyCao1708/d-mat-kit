@@ -24,7 +24,7 @@ interface DTableCellOptions<T = unknown> {
   justify: DCellJustify | ContextualValue<T>;
   colspan: number | ContextualValue<T>;
   rowspan: number | ContextualValue<T>;
-  classList: string[] | ContextualValue<T>;
+  classList: string | ContextualValue<T>;
 }
 
 /** @docs-private */
@@ -35,7 +35,7 @@ class DHeaderCellOptions implements DTableCellOptions<never> {
   justify: DCellJustify;
   colspan: number = 1;
   rowspan: number = 1;
-  classList: string[] = [];
+  classList: string = '';
 
   constructor(
     defaultOptions: DTableColumnOptions,
@@ -50,7 +50,7 @@ class DHeaderCellOptions implements DTableCellOptions<never> {
 
   constructor(defaultOptions: DTableColumnOptions, ...args: any[]) {
     this.justify = defaultOptions.justify;
-      /** @NOTE Must clone this options because DTableColumnOptions is singleton */
+    /** @NOTE Must clone this options because DTableColumnOptions is singleton */
     this.sort = { ...defaultOptions.sort };
 
     if (typeof args[0] === 'string' || args[0] === undefined) {
@@ -75,10 +75,16 @@ class DHeaderCellOptions implements DTableCellOptions<never> {
       const headerCellDef = args[0] as DHeaderCellDef;
 
       this.template = headerCellDef.template;
-      this.justify = headerCellDef.justify();
-      this.colspan = headerCellDef.colspan();
-      this.rowspan = headerCellDef.colspan();
-      this.classList = headerCellDef.classList();
+      const headerCellJustify = headerCellDef.justify();
+      if (headerCellJustify) this.justify = headerCellJustify;
+
+      this.colspan = headerCellDef.colspan() ?? 1;
+      this.rowspan = headerCellDef.colspan() ?? 1;
+      this.classList = headerCellDef.classList() || '';
+    }
+
+    if (!this.sort.disabled) {
+      this.classList += `d-table-header-sortable-header-justify-${this.justify}`;
     }
   }
 }
@@ -90,7 +96,7 @@ class DCellOptions<T = unknown> implements DTableCellOptions<T> {
   justify: ContextualValue<T>;
   colspan: ContextualValue<T> = new ContextualValue(1);
   rowspan: ContextualValue<T> = new ContextualValue(1);
-  classList: ContextualValue<T> = new ContextualValue([]);
+  classList: ContextualValue<T> = new ContextualValue('');
 
   constructor(
     defaultOptions: DTableColumnOptions,
@@ -106,10 +112,12 @@ class DCellOptions<T = unknown> implements DTableCellOptions<T> {
       const cellDef = args[0] as DCellDef;
 
       this.template = cellDef.template;
-      this.justify = cellDef.justify();
-      this.colspan = cellDef.colspan();
-      this.rowspan = cellDef.colspan();
-      this.classList = cellDef.classList();
+      const cellJustify = cellDef.justify();
+      if (cellJustify) this.justify = cellJustify;
+
+      this.colspan = cellDef.colspan() || new ContextualValue(1);
+      this.rowspan = cellDef.colspan() || new ContextualValue(1);
+      this.classList = cellDef.classList() || new ContextualValue('');
     } else {
       this.dataAccessor =
         args[0] ||
@@ -129,7 +137,7 @@ abstract class DRowCellOptions<T extends DStaticInputsCellDef & CanStickCell>
   justify: DCellJustify;
   colspan: number = 1;
   rowspan: number = 1;
-  classList: string[] = [];
+  classList: string = '';
   sticky: boolean = false;
   stickyEnd: boolean = false;
 
@@ -143,7 +151,7 @@ abstract class DRowCellOptions<T extends DStaticInputsCellDef & CanStickCell>
     columnOptions: DColumnOptions<any>,
     cellDef?: T
   ) {
-    this.justify = defaultOptions.justify;
+    this.justify = columnOptions.justify || defaultOptions.justify;
     this._rowName = rowName;
     this._columnName = columnOptions.name;
     this.sticky = columnOptions.sticky;
@@ -151,10 +159,12 @@ abstract class DRowCellOptions<T extends DStaticInputsCellDef & CanStickCell>
 
     if (cellDef) {
       this.template = cellDef.template;
-      this.justify = cellDef.justify();
-      this.colspan = cellDef.colspan();
-      this.rowspan = cellDef.colspan();
-      this.classList = cellDef.classList();
+      this.colspan = cellDef.colspan() ?? 1;
+      this.rowspan = cellDef.colspan() ?? 1;
+      this.classList = cellDef.classList() || '';
+
+      const cellJustify = cellDef.justify();
+      if (cellJustify !== undefined) this.justify = cellJustify;
 
       const cellDefSticky = cellDef.sticky();
       if (cellDefSticky !== undefined) this.sticky = cellDefSticky;
@@ -184,6 +194,7 @@ export class DColumnOptions<T> {
   name: string;
   sticky: boolean;
   stickyEnd: boolean;
+  justify: DCellJustify;
 
   headerCell: DHeaderCellOptions;
   cell: DCellOptions<T>;
@@ -200,6 +211,7 @@ export class DColumnOptions<T> {
     this.name = column.name;
     this.sticky = !!column.sticky;
     this.stickyEnd = !!column.stickyEnd;
+    this.justify = column.justify || defaultOptions.justify;
 
     if (template.cellDef) {
       this.cell = new DCellOptions(defaultOptions, template.cellDef);

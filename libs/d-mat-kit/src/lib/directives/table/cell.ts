@@ -14,7 +14,6 @@ import {
   coerceBooleanProperty,
   coerceNumberProperty,
 } from '@angular/cdk/coercion';
-import { TABLE_OPTIONS } from '../../tokens/config';
 
 /**
  * Represents the common interface for defining cell-related metadata within the {@link DTable} component.
@@ -26,13 +25,13 @@ interface DTableCellDef<T = unknown> {
   /** The `TemplateRef` that contains the template used to render the contents of the cell. */
   template: TemplateRef<any>;
   /** Cell's colspan attribute value */
-  colspan: Signal<number | ContextualValue<T>>;
+  colspan: Signal<number | ContextualValue<T> | undefined>;
   /** Cell's rowspan attribute value */
-  rowspan: Signal<number | ContextualValue<T>>;
+  rowspan: Signal<number | ContextualValue<T> | undefined>;
   /** Cell's class attribute value */
-  classList: Signal<string[] | ContextualValue<T>>;
+  classList: Signal<string | ContextualValue<T> | undefined>;
   /** Cell's text alignment */
-  justify: Signal<DCellJustify | ContextualValue<T>>;
+  justify: Signal<DCellJustify | ContextualValue<T> | undefined>;
 }
 
 /** Indicates the cell can be configured to "stick" to the start or end of a table when scrolling. */
@@ -45,28 +44,24 @@ export interface CanStickCell {
 
 /** Abstract class for cell definition directives that use static (non-contextual) inputs. */
 export abstract class DStaticInputsCellDef implements DTableCellDef<never> {
-  private readonly _defaultOptions = inject(TABLE_OPTIONS);
-
   abstract columnName: InputSignal<string>;
 
   template = inject(TemplateRef<never>) as TemplateRef<never>;
 
   get classList() {
-    return computed(() => this._cell()?.classList() || []);
+    return computed(() => this._cell()?.classList());
   }
 
   get colspan() {
-    return computed(() => this._cell()?.colspan() ?? 1);
+    return computed(() => this._cell()?.colspan());
   }
 
   get rowspan() {
-    return computed(() => this._cell()?.rowspan() ?? 1);
+    return computed(() => this._cell()?.rowspan());
   }
 
   get justify() {
-    return computed(
-      () => this._cell()?.justify() || this._defaultOptions.column.justify
-    );
+    return computed(() => this._cell()?.justify());
   }
 
   protected _cell = signal<DStaticInputsCell | undefined>(undefined);
@@ -80,23 +75,24 @@ export abstract class DStaticInputsCellDef implements DTableCellDef<never> {
 /** Abstract class cell directives that use static (non-contextual) inputs. */
 @Directive()
 abstract class DStaticInputsCell {
-  private readonly _defaultOptions = inject(TABLE_OPTIONS);
-
-   /** Cell's class attribute value */
-  abstract classList: InputSignalWithTransform<string[], string | string[]>;
+  /** Cell's class attribute value */
+  abstract classList: InputSignalWithTransform<
+    string | undefined,
+    string | string[]
+  >;
 
   /** Cell's colspan attribute value */
-  colspan = input<number, number | string>(1, {
-    transform: (v: string | number) => coerceNumberProperty(v),
+  colspan = input<number, number | string>(undefined, {
+    transform: (v: string | number | undefined) => coerceNumberProperty(v),
   });
 
   /** Cell's rowspan attribute value */
-  rowspan = input<number, number | string>(1, {
-    transform: (v: string | number) => coerceNumberProperty(v),
+  rowspan = input<number, number | string>(undefined, {
+    transform: (v: string | number | undefined) => coerceNumberProperty(v),
   });
 
   /** Cell's text alignment */
-  justify = input<DCellJustify>(this._defaultOptions.column.justify);
+  justify = input<DCellJustify>();
 }
 
 /**
@@ -107,32 +103,24 @@ abstract class DStaticInputsCell {
   selector: '[dCellDef]',
 })
 export class DCellDef<T = unknown> implements DTableCellDef<T> {
-  private readonly _defaultOptions = inject(TABLE_OPTIONS);
-
   columnName = input.required<string>({ alias: 'dCellDef' });
 
   template = inject(TemplateRef<DCellContext<T>>);
 
   get classList() {
-    return computed(
-      () => this._cell()?.classList() || new ContextualValue<T>([])
-    );
+    return computed(() => this._cell()?.classList());
   }
 
   get colspan() {
-    return computed(() => this._cell()?.colspan() ?? new ContextualValue<T>(1));
+    return computed(() => this._cell()?.colspan());
   }
 
   get rowspan() {
-    return computed(() => this._cell()?.rowspan() ?? new ContextualValue<T>(1));
+    return computed(() => this._cell()?.rowspan());
   }
 
   get justify() {
-    return computed(
-      () =>
-        this._cell()?.justify() ||
-        new ContextualValue<T>(this._defaultOptions.column.justify)
-    );
+    return computed(() => this._cell()?.justify());
   }
 
   private _cell = signal<DCell<T> | null>(null);
@@ -175,13 +163,15 @@ export class DCellDef<T = unknown> implements DTableCellDef<T> {
   selector: '[d-cell]',
 })
 export class DCell<T = unknown> {
-  private readonly _defaultOptions = inject(TABLE_OPTIONS);
-
   classList = input<ContextualValue<T>, string | string[] | ContextualValue>(
-    new ContextualValue([]),
+    undefined,
     {
       alias: 'tdClass',
-      transform: (value: string | string[] | ContextualValue<any>) => {
+      transform: (
+        value: string | string[] | ContextualValue<any> | undefined
+      ) => {
+        if (value === undefined) return;
+
         if (value instanceof ContextualValue) return value;
 
         const values = [value].flat().filter(Boolean);
@@ -192,9 +182,11 @@ export class DCell<T = unknown> {
   );
 
   colspan = input<ContextualValue<T>, number | string | ContextualValue<any>>(
-    new ContextualValue(1),
+    undefined,
     {
-      transform: (value: number | string | ContextualValue) => {
+      transform: (value: number | string | ContextualValue | undefined) => {
+        if (value === undefined) return;
+
         if (value instanceof ContextualValue) return value;
 
         return new ContextualValue(value);
@@ -203,9 +195,11 @@ export class DCell<T = unknown> {
   );
 
   rowspan = input<ContextualValue<T>, number | string | ContextualValue<any>>(
-    new ContextualValue(1),
+    undefined,
     {
-      transform: (value: number | string | ContextualValue) => {
+      transform: (value: number | string | ContextualValue | undefined) => {
+        if (value === undefined) return;
+
         if (value instanceof ContextualValue) return value;
 
         return new ContextualValue(value);
@@ -214,9 +208,11 @@ export class DCell<T = unknown> {
   );
 
   justify = input<ContextualValue<T>, DCellJustify | ContextualValue<any>>(
-    new ContextualValue(this._defaultOptions.column.justify),
+    undefined,
     {
-      transform: (value: DCellJustify | ContextualValue) => {
+      transform: (value: DCellJustify | ContextualValue | undefined) => {
+        if (value === undefined) return;
+
         if (value instanceof ContextualValue) return value;
 
         return new ContextualValue(value);
@@ -249,9 +245,10 @@ export class DHeaderCellDef extends DStaticInputsCellDef {
   selector: '[d-header-cell]',
 })
 export class DHeaderCell extends DStaticInputsCell {
-  classList = input<string[], string | string[]>([], {
+  classList = input<string, string | string[]>(undefined, {
     alias: 'thClass',
-    transform: (value: string | string[]) => [value].flat().filter(Boolean),
+    transform: (value: string | string[] | undefined) =>
+      [value].flat().filter(Boolean).join(' '),
   });
 
   constructor() {
@@ -288,9 +285,10 @@ export class DFooterCellDef extends DStaticInputsCellDef {
   selector: '[d-footer-cell]',
 })
 export class DFooterCell extends DStaticInputsCell {
-  classList = input<string[], string | string[]>([], {
+  classList = input<string, string | string[]>(undefined, {
     alias: 'tdClass',
-    transform: (value: string | string[]) => [value].flat().filter(Boolean),
+    transform: (value: string | string[] | undefined) =>
+      [value].flat().filter(Boolean).join(' '),
   });
 
   sticky = input<boolean, boolean | string>(undefined, {
@@ -340,9 +338,10 @@ export class DAltHeaderCellDef
   selector: '[d-alt-header-cell]',
 })
 export class DAltHeaderCell extends DStaticInputsCell implements CanStickCell {
-  classList = input<string[], string | string[]>([], {
+  classList = input<string, string | string[]>(undefined, {
     alias: 'thClass',
-    transform: (value: string | string[]) => [value].flat().filter(Boolean),
+    transform: (value: string | string[] | undefined) =>
+      [value].flat().filter(Boolean).join(' '),
   });
 
   sticky = input<boolean, boolean | string>(undefined, {

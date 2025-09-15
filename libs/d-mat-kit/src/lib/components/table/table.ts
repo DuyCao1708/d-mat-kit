@@ -43,7 +43,12 @@ import { TABLE_OPTIONS } from '../../tokens/config';
 import { DTableExpandableOutlet } from './table-expandable-outlet';
 import { Observable } from 'rxjs';
 import { DataSource } from '@angular/cdk/table';
-import { ContextualValue, DCellContext, DColumn } from '../../models';
+import {
+  ContextualValue,
+  DCellContext,
+  DCellJustify,
+  DColumn,
+} from '../../models';
 
 /** Dynamically bind contextual properties like class, colspan, and rowspan based on a table row context.  */
 @Directive({ selector: 'td[dCellContext]' })
@@ -52,45 +57,58 @@ export class DCellBinding {
   context = input.required<DCellContext>({ alias: 'dCellContext' });
 
   /** The contextual value of the table cell classes. */
-  classList = input<ContextualValue, string | string[] | ContextualValue<any>>(
-    new ContextualValue(''),
-    {
-      alias: 'contextualClass',
-      transform: (value: string | string[] | ContextualValue) => {
-        if (value instanceof ContextualValue) return value;
+  classList = input.required<
+    ContextualValue,
+    string | string[] | ContextualValue<any>
+  >({
+    alias: 'contextualClass',
+    transform: (value: string | string[] | ContextualValue) => {
+      if (value instanceof ContextualValue) return value;
 
-        const values = [value].flat().filter(Boolean) as string[];
+      const values = [value].flat().filter(Boolean) as string[];
 
-        return new ContextualValue(values);
-      },
-    }
-  );
+      return new ContextualValue(values);
+    },
+  });
 
   /** The contextual value of the table cell colspan. */
-  colspan = input<ContextualValue, number | string | ContextualValue<any>>(
-    new ContextualValue(1),
-    {
-      alias: 'contextualColspan',
-      transform: (value: number | string | ContextualValue) => {
-        if (value instanceof ContextualValue) return value;
+  colspan = input.required<
+    ContextualValue,
+    number | string | ContextualValue<any>
+  >({
+    alias: 'contextualColspan',
+    transform: (value: number | string | ContextualValue) => {
+      if (value instanceof ContextualValue) return value;
 
-        return new ContextualValue(value);
-      },
-    }
-  );
+      return new ContextualValue(value);
+    },
+  });
 
   /** The contextual value of the table cell rowpsan. */
-  rowspan = input<ContextualValue, number | string | ContextualValue<any>>(
-    new ContextualValue(1),
-    {
-      alias: 'contextualRowspan',
-      transform: (value: number | string | ContextualValue) => {
-        if (value instanceof ContextualValue) return value;
+  rowspan = input.required<
+    ContextualValue,
+    number | string | ContextualValue<any>
+  >({
+    alias: 'contextualRowspan',
+    transform: (value: number | string | ContextualValue) => {
+      if (value instanceof ContextualValue) return value;
 
-        return new ContextualValue(value);
-      },
-    }
-  );
+      return new ContextualValue(value);
+    },
+  });
+
+  /** The contextual value of the table cell justify. */
+  justify = input.required<
+    ContextualValue,
+    DCellJustify | ContextualValue<any>
+  >({
+    alias: 'contextualJustify',
+    transform: (value: DCellJustify | ContextualValue) => {
+      if (value instanceof ContextualValue) return value;
+
+      return new ContextualValue(value);
+    },
+  });
 
   @HostBinding('class') get hostClassList() {
     return this.classList().getValueByContext(this.context());
@@ -109,6 +127,10 @@ export class DCellBinding {
     const rowspan = this.rowspan().getValueByContext(this.context());
 
     return Number(colspan) === 0 || Number(rowspan) === 0 ? 'none' : '';
+  }
+
+  @HostBinding('style.text-align') get hostStyleTextAlign() {
+    return this.justify().getValueByContext(this.context());
   }
 }
 
@@ -150,7 +172,6 @@ export class DCellBinding {
           mat-header-cell
           *matHeaderCellDef
           [class]="column.headerCell.classList"
-          [style.text-align]="column.headerCell.justify"
           [mat-sort-header]="column.headerCell.sort.id"
           [arrowPosition]="column.headerCell.sort.arrowPosition"
           [disableClear]="column.headerCell.sort.disableClear"
@@ -202,7 +223,7 @@ export class DCellBinding {
           [contextualClass]="column.cell.classList"
           [contextualColspan]="column.cell.colspan"
           [contextualRowspan]="column.cell.rowspan"
-          [style.text-align]="column.cell.justify"
+          [contextualJustify]="column.cell.justify"
         >
           @if (column.cell.template) {
           <ng-container
@@ -306,7 +327,7 @@ export class DCellBinding {
           *matCellDef="let row; dataIndex as dataIndex"
           [attr.colspan]="columnsNames().length"
           class="d-table-expandable-cell"
-            [class.d-table-expandable-cell-sticky]="_expandableRowDef.sticky()"
+          [class.d-table-expandable-cell-sticky]="_expandableRowDef.sticky()"
           [class]="_expandableRowDef.classList()"
         >
           <div
@@ -409,7 +430,7 @@ export class DCellBinding {
         padding-right: 0;
         border-bottom: 0;
       }
-      
+
       .d-table-expandable-cell-sticky {
         overflow: visible;
       }
