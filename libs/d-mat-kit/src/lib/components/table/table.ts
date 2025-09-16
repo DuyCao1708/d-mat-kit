@@ -703,7 +703,6 @@ export class DTable<T = unknown> {
 
     this._matColumnDefs().forEach((columnDef) => {
       this._matTable().addColumnDef(columnDef);
-      console.log(columnDef.cssClassFriendlyName);
     });
   }
 
