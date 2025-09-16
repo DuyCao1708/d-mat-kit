@@ -163,7 +163,7 @@ export class DCellDef<T = unknown> implements DTableCellDef<T> {
   selector: '[d-cell]',
 })
 export class DCell<T = unknown> {
-  classList = input<ContextualValue<T>, string | string[] | ContextualValue>(
+  classList = input<ContextualValue<T>, string | string[] | ContextualValue<any>>(
     undefined,
     {
       alias: 'tdClass',
