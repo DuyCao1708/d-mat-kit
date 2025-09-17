@@ -39,7 +39,8 @@ class DHeaderCellOptions implements DTableCellOptions<never> {
 
   constructor(
     defaultOptions: DTableColumnOptions,
-    headerCellDef: DHeaderCellDef
+    headerCellDef: DHeaderCellDef,
+    justify?: DCellJustify
   );
   constructor(
     defaultOptions: DTableColumnOptions,
@@ -49,7 +50,8 @@ class DHeaderCellOptions implements DTableCellOptions<never> {
   );
 
   constructor(defaultOptions: DTableColumnOptions, ...args: any[]) {
-    this.justify = defaultOptions.justify;
+    const definedJustify = args[1] as DCellJustify | undefined;
+    this.justify = definedJustify || defaultOptions.justify;
     /** @NOTE Must clone this options because DTableColumnOptions is singleton */
     this.sort = { ...defaultOptions.sort };
 
@@ -103,10 +105,17 @@ class DCellOptions<T = unknown> implements DTableCellOptions<T> {
     dataAccessor?: (data: T, name: string) => string,
     justify?: DCellJustify
   );
-  constructor(defaultOptions: DTableColumnOptions, cellDef: DCellDef<T>);
+  constructor(
+    defaultOptions: DTableColumnOptions,
+    cellDef: DCellDef<T>,
+    justify?: DCellJustify
+  );
 
   constructor(defaultOptions: DTableColumnOptions, ...args: any[]) {
-    this.justify = new ContextualValue(defaultOptions.justify);
+    const definedJustify = args[1] as DCellJustify | undefined;
+    this.justify = new ContextualValue(
+      definedJustify || defaultOptions.justify
+    );
 
     if (typeof args[0] === 'object') {
       const cellDef = args[0] as DCellDef;
@@ -214,7 +223,11 @@ export class DColumnOptions<T> {
     this.justify = column.justify || defaultOptions.justify;
 
     if (template.cellDef) {
-      this.cell = new DCellOptions(defaultOptions, template.cellDef);
+      this.cell = new DCellOptions(
+        defaultOptions,
+        template.cellDef,
+        column.justify
+      );
     } else {
       this.cell = new DCellOptions(
         defaultOptions,
@@ -226,7 +239,8 @@ export class DColumnOptions<T> {
     if (template.headerCellDef) {
       this.headerCell = new DHeaderCellOptions(
         defaultOptions,
-        template.headerCellDef
+        template.headerCellDef,
+        column.justify
       );
     } else {
       this.headerCell = new DHeaderCellOptions(
