@@ -169,7 +169,7 @@ abstract class DRowCellOptions<T extends DStaticInputsCellDef & CanStickCell>
     if (cellDef) {
       this.template = cellDef.template;
       this.colspan = cellDef.colspan() ?? 1;
-      this.rowspan = cellDef.colspan() ?? 1;
+      this.rowspan = cellDef.rowspan() ?? 1;
       this.classList = cellDef.classList() || '';
 
       const cellJustify = cellDef.justify();
