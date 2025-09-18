@@ -40,7 +40,8 @@ class DHeaderCellOptions implements DTableCellOptions<never> {
   constructor(
     defaultOptions: DTableColumnOptions,
     headerCellDef: DHeaderCellDef,
-    justify?: DCellJustify
+    justify?: DCellJustify,
+    sort?: Partial<DSortHeader> | boolean
   );
   constructor(
     defaultOptions: DTableColumnOptions,
@@ -57,32 +58,30 @@ class DHeaderCellOptions implements DTableCellOptions<never> {
 
     if (typeof args[0] === 'string' || args[0] === undefined) {
       this.displayText = args[0] || '';
-
-      const justify = args[1] as DCellJustify | undefined;
-      if (justify) this.justify = justify;
-
-      const sort = args[2] as Partial<DSortHeader> | boolean | undefined;
-
-      if (typeof sort === 'boolean') {
-        this.sort.disabled = !sort;
-      } else if (sort && typeof sort === 'object') {
-        this.sort.disabled = false;
-
-        this.sort = {
-          ...this.sort,
-          ...sort,
-        };
-      }
     } else {
       const headerCellDef = args[0] as DHeaderCellDef;
 
       this.template = headerCellDef.template;
+
       const headerCellJustify = headerCellDef.justify();
       if (headerCellJustify) this.justify = headerCellJustify;
 
       this.colspan = headerCellDef.colspan() ?? 1;
       this.rowspan = headerCellDef.colspan() ?? 1;
       this.classList = headerCellDef.classList() || '';
+    }
+
+    const sort = args[2] as Partial<DSortHeader> | boolean | undefined;
+
+    if (typeof sort === 'boolean') {
+      this.sort.disabled = !sort;
+    } else if (sort && typeof sort === 'object') {
+      this.sort.disabled = false;
+
+      this.sort = {
+        ...this.sort,
+        ...sort,
+      };
     }
 
     if (!this.sort.disabled) {
@@ -121,6 +120,7 @@ class DCellOptions<T = unknown> implements DTableCellOptions<T> {
       const cellDef = args[0] as DCellDef;
 
       this.template = cellDef.template;
+
       const cellJustify = cellDef.justify();
       if (cellJustify) this.justify = cellJustify;
 
@@ -131,9 +131,6 @@ class DCellOptions<T = unknown> implements DTableCellOptions<T> {
       this.dataAccessor =
         args[0] ||
         (defaultOptions.dataAccessor as (data: T, name: string) => string);
-
-      const justify = args[1] as DCellJustify | undefined;
-      if (justify) this.justify = new ContextualValue(justify);
     }
   }
 }
@@ -240,7 +237,8 @@ export class DColumnOptions<T> {
       this.headerCell = new DHeaderCellOptions(
         defaultOptions,
         template.headerCellDef,
-        column.justify
+        column.justify,
+        column.sort
       );
     } else {
       this.headerCell = new DHeaderCellOptions(
