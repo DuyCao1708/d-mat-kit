@@ -119,8 +119,10 @@ export class DTableExpandableOutlet<T> {
     const tableElement = this._table.elementRef.nativeElement;
 
     this._resizeObserver = new ResizeObserver(() => {
-      const tableWidth = tableElement.clientWidth;
-      this._renderer.setStyle(this._hostElement, 'width', `${tableWidth}px`);
+      requestAnimationFrame(() => {
+        const tableWidth = tableElement.clientWidth;
+        this._renderer.setStyle(this._hostElement, 'width', `${tableWidth}px`);
+      });
     });
 
     effect(() => {
