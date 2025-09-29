@@ -85,7 +85,7 @@ class DHeaderCellOptions implements DTableCellOptions<never> {
     }
 
     if (!this.sort.disabled) {
-      this.classList += `d-table-header-sortable-header-justify-${this.justify}`;
+      this.classList += ` d-table-header-sortable-header-justify-${this.justify}`;
     }
   }
 }
