@@ -98,6 +98,7 @@ export class DSwipe {
       if (!isSwiping) return;
 
       delta = getPointerPosition(event) - start;
+
       applyTransform(delta);
       !isDisabled && this.swiping.emit(delta);
     };
@@ -139,6 +140,12 @@ export class DSwipe {
     this._removeListenerFns.push(
       this._renderer.listen(element, 'mouseleave', () => {
         this._renderer.removeStyle(element, 'cursor');
+      })
+    );
+    //Disable default behavior of touch on mobile device to allow swipe
+    this._removeListenerFns.push(
+      this._renderer.listen(element, 'touchmove', (event) => {
+        event.preventDefault();
       })
     );
   }
