@@ -2,14 +2,11 @@ import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   computed,
   Directive,
-  effect,
-  EmbeddedViewRef,
   inject,
   input,
   output,
   signal,
   TemplateRef,
-  ViewContainerRef,
 } from '@angular/core';
 import { TABLE_OPTIONS } from '../../tokens/config';
 
