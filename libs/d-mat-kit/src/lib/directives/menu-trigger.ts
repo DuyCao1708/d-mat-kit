@@ -6,7 +6,6 @@ import { MediaMatcher } from '@angular/cdk/layout';
 import {
   Directive,
   EventEmitter,
-  HostListener,
   inject,
   input,
   Renderer2,
@@ -35,6 +34,10 @@ import { filter, Subject } from 'rxjs';
       outputs: ['menuClosed', 'menuOpened'],
     },
   ],
+  host: {
+    '(mouseenter)': 'openMenuOnMouseEnter()',
+    '(mouseleave)': 'closeMenuOnMouseLeave()',
+  },
   exportAs: 'dMenuTrigger',
 })
 export class DMenuTrigger {
@@ -120,7 +123,6 @@ export class DMenuTrigger {
     if (this._matMenu && this.hoverable()) this._matMenu.hasBackdrop = false;
   }
 
-  @HostListener('mouseenter')
   protected openMenuOnMouseEnter() {
     if (!this.hoverable()) return;
 
@@ -135,7 +137,6 @@ export class DMenuTrigger {
     }, this.menuOpenDelay());
   }
 
-  @HostListener('mouseleave')
   protected closeMenuOnMouseLeave() {
     if (!this.hoverable()) return;
 
