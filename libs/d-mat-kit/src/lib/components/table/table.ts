@@ -6,7 +6,6 @@ import {
   contentChildren,
   Directive,
   ElementRef,
-  HostBinding,
   inject,
   input,
   output,
@@ -51,7 +50,16 @@ import {
 } from '../../models';
 
 /** Dynamically bind contextual properties like class, colspan, and rowspan based on a table row context.  */
-@Directive({ selector: 'td[dCellContext]' })
+@Directive({
+  selector: 'td[dCellContext]',
+  host: {
+    '[class]': 'hostClassList',
+    '[attr.colspan]': 'hostColspan',
+    '[attr.rowspan]': 'hostRowspan',
+    '[style.display]': 'hostStyleDisplay',
+    '[style.text-align]': 'hostStyleTextAlign',
+  },
+})
 export class DCellBinding {
   /** The row context of the table cell. */
   context = input.required<DCellContext>({ alias: 'dCellContext' });
@@ -110,26 +118,26 @@ export class DCellBinding {
     },
   });
 
-  @HostBinding('class') get hostClassList() {
+  get hostClassList() {
     return this.classList().getValueByContext(this.context());
   }
 
-  @HostBinding('attr.colspan') get hostColspan() {
+  get hostColspan() {
     return this.colspan().getValueByContext(this.context());
   }
 
-  @HostBinding('attr.rowspan') get hostRowspan() {
+  get hostRowspan() {
     return this.rowspan().getValueByContext(this.context());
   }
 
-  @HostBinding('style.display') get hostStyleDisplay() {
+  get hostStyleDisplay() {
     const colspan = this.colspan().getValueByContext(this.context());
     const rowspan = this.rowspan().getValueByContext(this.context());
 
     return Number(colspan) === 0 || Number(rowspan) === 0 ? 'none' : '';
   }
 
-  @HostBinding('style.text-align') get hostStyleTextAlign() {
+  get hostStyleTextAlign() {
     return this.justify().getValueByContext(this.context());
   }
 }
@@ -447,6 +455,9 @@ export class DCellBinding {
       }
     `,
   ],
+  host: {
+    '[style.position]': 'hostPositionStyle',
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DTable<T = unknown> {
@@ -589,13 +600,11 @@ export class DTable<T = unknown> {
   readonly elementRef = inject(ElementRef);
   //#endregion
 
-  //#region HostBindings
-  @HostBinding('style.position') get hostPositionStyle() {
+  get hostPositionStyle() {
     const hasStickyExpandableRow = this.expandableRowDef()?.sticky;
 
     return hasStickyExpandableRow ? 'relative' : '';
   }
-  //#endregion
 
   constructor() {
     const intl = inject(TABLE_INTL);

@@ -3,7 +3,6 @@ import {
   effect,
   ElementRef,
   EmbeddedViewRef,
-  HostBinding,
   inject,
   input,
   Renderer2,
@@ -38,6 +37,9 @@ import { distinctUntilChanged } from 'rxjs';
       }
     `,
   ],
+  host: {
+    '[style]': 'hostStickyStyles',
+  },
 })
 export class DTableExpandableOutlet<T> {
   /** Context for the row template, typically the data item of type `T`. */
@@ -63,7 +65,7 @@ export class DTableExpandableOutlet<T> {
     return this._table.expandableRowDef()!;
   }
 
-  @HostBinding('style') get hostStickyStyles() {
+  protected get hostStickyStyles() {
     const isSticky = this.expandableRowDef.sticky();
 
     if (!isSticky) return '';
