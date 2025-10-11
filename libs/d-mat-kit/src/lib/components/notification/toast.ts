@@ -1,4 +1,4 @@
-import { Component, HostBinding, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { DNotificationType, DToastOptions } from '../../models';
 import { provideMarkdown, MarkdownComponent } from 'ngx-markdown';
 import { MatIconModule } from '@angular/material/icon';
@@ -60,6 +60,11 @@ import { MatButtonModule } from '@angular/material/button';
       }
     `,
   ],
+  host: {
+    '[style.background-color]': 'getBackgroundColor',
+    '[style.color]': 'getTextColor',
+    '[style.animation]': 'getAnimation',
+  },
   providers: [provideMarkdown()],
 })
 export class DToast {
@@ -72,12 +77,12 @@ export class DToast {
   close = output<void>();
 
   /** Dynamically binds background color based on the toast type. */
-  @HostBinding('style.background-color') get getBackgroundColor() {
+  protected get getBackgroundColor() {
     return `var( --d-toast-${this.options().type}-container-color)`;
   }
 
   /** Dynamically binds text color based on the toast type. */
-  @HostBinding('style.color') get getTextColor() {
+  protected get getTextColor() {
     return `var( --d-toast-${this.options().type}-text-color)`;
   }
 
@@ -85,7 +90,7 @@ export class DToast {
    * Binds animation styles for slide-in and fade-out effects.
    * Fade-out timing depends on `options.timeout`.
    */
-  @HostBinding('style.animation') get getAnimation() {
+  protected get getAnimation() {
     return `dToastSlideInLeft ease 0.3s, dToastFadeOut linear 1s ${
       this.options().timeout
     }s forwards`;
