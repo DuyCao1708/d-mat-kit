@@ -1,16 +1,16 @@
 import { Component, inject, output } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 import { DToast } from './toast';
 import { DToastOptionsWithId } from '../../models/notification/toast-options-with-id';
 import { DSwipe } from '../../directives/swipe';
+import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
 
 /**
- * Component dialog container that renders a list of toast notifications.
+ * Component outlet that renders a list of toast notifications.
  */
 @Component({
-  selector: 'd-toast-dialog',
+  selector: 'd-toasts-outlet',
   imports: [DToast, DSwipe],
   template: `
     @for(options of toastsOptions(); track options.id) {
@@ -26,13 +26,13 @@ import { DSwipe } from '../../directives/swipe';
     }
   `,
 })
-export class DToastDialog {
+export class DToastsOutlet {
   /**
    * Signal wrapping an Observable array of toast options with IDs.
    * Used to dynamically render the list of toasts.
    */
   protected readonly toastsOptions = toSignal(
-    inject(MAT_DIALOG_DATA) as Observable<DToastOptionsWithId[]>,
+    inject(MAT_SNACK_BAR_DATA) as Observable<DToastOptionsWithId[]>,
     { initialValue: [] }
   );
 

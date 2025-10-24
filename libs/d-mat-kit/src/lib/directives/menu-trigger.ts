@@ -1,6 +1,8 @@
 import {
+  BooleanInput,
   coerceBooleanProperty,
   coerceNumberProperty,
+  NumberInput,
 } from '@angular/cdk/coercion';
 import { MediaMatcher } from '@angular/cdk/layout';
 import {
@@ -65,8 +67,8 @@ export class DMenuTrigger {
    *
    * Applicable on hoverable device only
    */
-  hoverable = input<boolean, boolean | string>(false, {
-    transform: (value: string | boolean) =>
+  hoverable = input<boolean, BooleanInput>(false, {
+    transform: (value: BooleanInput) =>
       coerceBooleanProperty(value) && this._isHoverableDevice,
     alias: 'dMenuTriggerHoverable',
   });
@@ -76,10 +78,9 @@ export class DMenuTrigger {
    *
    * Applicable when `dMenuTriggerHoverable` is set to `true`
    */
-  menuOpenDelay = input<number, number | string>(100, {
+  menuOpenDelay = input<number, NumberInput>(100, {
     alias: 'dMenuTriggerOpenDelay',
-    transform: (value: string | number) =>
-      Math.max(coerceNumberProperty(value), 0),
+    transform: (value: NumberInput) => Math.max(coerceNumberProperty(value), 0),
   });
 
   /**
@@ -87,10 +88,9 @@ export class DMenuTrigger {
    *
    * Applicable when `dMenuTriggerHoverable` is set to `true`
    */
-  menuCloseDelay = input<number, number | string>(100, {
+  menuCloseDelay = input<number, NumberInput>(100, {
     alias: 'dMenuTriggerCloseDelay',
-    transform: (value: string | number) =>
-      Math.max(coerceNumberProperty(value), 0),
+    transform: (value: NumberInput) => Math.max(coerceNumberProperty(value), 0),
   });
 
   /**
@@ -98,13 +98,13 @@ export class DMenuTrigger {
    *
    * Applicable when `dMenuTriggerHoverable` is set to `true`
    */
-  menuStayOpenOnHover = input<boolean, boolean | string>(true, {
+  menuStayOpenOnHover = input<boolean, BooleanInput>(true, {
     transform: coerceBooleanProperty,
     alias: 'dMenuTriggerStayOpenOnMenuHover',
   });
 
   /** Whether the menu should close when a menu item is clicked. */
-  menuCloseOnClick = input<boolean, boolean | string>(true, {
+  menuCloseOnClick = input<boolean, BooleanInput>(true, {
     transform: coerceBooleanProperty,
     alias: 'dMenuTriggerCloseOnClick',
   });

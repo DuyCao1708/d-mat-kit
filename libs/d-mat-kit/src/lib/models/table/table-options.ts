@@ -255,6 +255,7 @@ export class DColumnOptions<T> {
 abstract class DRowOptions<T extends DStaticInputsCellDef & CanStickCell> {
   name: string;
   sticky: boolean;
+  classList: string;
 
   abstract get columnsNames(): string[];
 
@@ -269,6 +270,7 @@ abstract class DRowOptions<T extends DStaticInputsCellDef & CanStickCell> {
   ) {
     this.name = row.rowName();
     this.sticky = row.sticky();
+    this.classList = row.classList();
   }
 
   protected _generateCellsOptions(
@@ -279,6 +281,8 @@ abstract class DRowOptions<T extends DStaticInputsCellDef & CanStickCell> {
     const cellDefsMap = new Map<string, T>();
 
     for (const cellDef of cellDefs) {
+      console.log(cellDef)
+
       const columnName = cellDef.columnName();
 
       if (cellDefsMap.has(columnName)) continue;

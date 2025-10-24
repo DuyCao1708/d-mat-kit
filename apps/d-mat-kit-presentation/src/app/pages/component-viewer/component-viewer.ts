@@ -59,9 +59,15 @@ import { BehaviorSubject, Subject } from 'rxjs';
       [columns]="[{ name: 'column1', header: ' hehe' }]"
       [dataSource]="[{ column1: '1231231' }]"
     >
+      [dataSource]="[]"
+    >
+      <ng-container dAltHeaderRow="hehe" trClass="bg-red-500">
+        <ng-container *dAltHeaderCellDef="'column1'" d-alt-header-cell
+          >alt header</ng-container
+        >
+      </ng-container>
     </d-table>
   `,
-  styles: ``,
 })
 export class ComponentViewer {
   constructor() {

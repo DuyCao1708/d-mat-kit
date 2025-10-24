@@ -35,7 +35,7 @@ import {
 } from '../../directives';
 import { NgTemplateOutlet } from '@angular/common';
 import { DCellDef } from '../../directives';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { TABLE_INTL } from '../../tokens/intl';
 import { TABLE_OPTIONS } from '../../tokens/config';
@@ -310,6 +310,7 @@ export class DCellBinding {
           altHeaderRow.columnsNames;
           sticky: altHeaderRow.sticky
         "
+        [class]="altHeaderRow.classList"
       ></tr>
       }
       <!--#endregion-->
@@ -385,11 +386,12 @@ export class DCellBinding {
       <tr
         mat-footer-row
         *matFooterRowDef="footerRow.columnsNames; sticky: footerRow.sticky"
+        [class]="footerRow.classList"
       ></tr>
       }
       <!--#endregion-->
 
-      @if (!hasNoDataRow()) {
+      @if (!hasContentNoDataRow() && this.useDefaultNoDataRow()) {
       <tr *matNoDataRow>
         <td [attr.colspan]="columnsNames().length">
           <p [style.text-align]="'center'" [style.margin]="'12px auto'">
@@ -490,15 +492,13 @@ export class DTable<T = unknown> {
     readonly T[] | DataSource<T> | Observable<readonly T[]>
   >();
   /** Whether the default header row should be hidden */
-  hideDefaultHeaderRow = input<boolean, boolean | string>(false, {
-    transform: (value: string | boolean) => coerceBooleanProperty(value),
+  hideDefaultHeaderRow = input<boolean, BooleanInput>(false, {
+    transform: coerceBooleanProperty,
   });
   /** Whether the default header row is sticky */
-  stickyDefaultHeaderRow = input<boolean, boolean | string>(
+  stickyDefaultHeaderRow = input<boolean, BooleanInput>(
     this._defaultOptions.stickyDefaultHeaderRow,
-    {
-      transform: (value: string | boolean) => coerceBooleanProperty(value),
-    }
+    { transform: coerceBooleanProperty }
   );
   /**
    * Tracking function that will be used to check the differences in data changes.
@@ -520,11 +520,14 @@ export class DTable<T = unknown> {
     }
   );
   /** Whether the only data row in table should be expanded automatically */
-  expandIfSingleRow = input<boolean, boolean | string>(
+  expandIfSingleRow = input<boolean, BooleanInput>(
     this._defaultOptions.expandIfSingleRow,
-    {
-      transform: (value: string | boolean) => coerceBooleanProperty(value),
-    }
+    { transform: coerceBooleanProperty }
+  );
+  /** Whether use default no data row or not */
+  useDefaultNoDataRow = input<boolean, BooleanInput>(
+    this._defaultOptions.useDefaultNoDataRow,
+    { transform: coerceBooleanProperty }
   );
 
   /** Emits when the table completes rendering a set of data rows based on the latest data from the data source, even if the set of rows is empty. */
@@ -539,7 +542,9 @@ export class DTable<T = unknown> {
   private readonly _matFooterRowDefs =
     contentChildren<MatFooterRowDef>(MatFooterRowDef);
   private readonly _matNoDataRow = contentChild(MatNoDataRow);
-  protected readonly hasNoDataRow = computed(() => !!this._matNoDataRow());
+  protected readonly hasContentNoDataRow = computed(
+    () => !!this._matNoDataRow()
+  );
   private readonly _matColumnDefs = contentChildren(MatColumnDef);
   //#endregion
 

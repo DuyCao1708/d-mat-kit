@@ -135,6 +135,8 @@ export type DTableOptions = {
   stickyDefaultHeaderRow: boolean;
   /** Whether the only data row in table should be expanded automatically */
   expandIfSingleRow: boolean;
+  /** Whether use default no data row or not */
+  useDefaultNoDataRow: boolean;
   /** Table column default options */
   column: DTableColumnOptions;
   /** Table expandable default row options */
