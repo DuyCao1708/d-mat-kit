@@ -1,4 +1,4 @@
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   contentChildren,
   Directive,
@@ -26,7 +26,7 @@ export abstract class DRow<T extends DStaticInputsCellDef & CanStickCell> {
   abstract rowName: InputSignal<string>;
 
   /** Whether the row is sticky. */
-  abstract sticky: InputSignalWithTransform<boolean, string | boolean>;
+  abstract sticky: InputSignalWithTransform<boolean, BooleanInput>;
 
   /** Row's class attribute value */
   abstract classList: InputSignal<string>;
@@ -79,8 +79,8 @@ export abstract class DRow<T extends DStaticInputsCellDef & CanStickCell> {
 export class DAltHeaderRow extends DRow<DAltHeaderCellDef> {
   rowName = input.required<string>({ alias: 'dAltHeaderRow' });
 
-  sticky = input<boolean, boolean | string>(false, {
-    transform: (value: string | boolean) => coerceBooleanProperty(value),
+  sticky = input<boolean, BooleanInput>(false, {
+    transform: coerceBooleanProperty,
   });
 
   classList = input<string>('', { alias: 'trClass' });
@@ -93,8 +93,8 @@ export class DAltHeaderRow extends DRow<DAltHeaderCellDef> {
 export class DFooterRow extends DRow<DFooterCellDef> {
   rowName = input.required<string>({ alias: 'dFooterRow' });
 
-  sticky = input<boolean, boolean | string>(false, {
-    transform: (value: string | boolean) => coerceBooleanProperty(value),
+  sticky = input<boolean, BooleanInput>(false, {
+    transform: coerceBooleanProperty,
   });
 
   classList = input<string>('', { alias: 'trClass' });

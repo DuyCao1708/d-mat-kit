@@ -6,7 +6,7 @@ import {
   output,
   Renderer2,
 } from '@angular/core';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 
 /** Defines allowed swipe orientations. */
 export type DSwipeOrientation = 'horizontal' | 'vertical';
@@ -33,8 +33,8 @@ export class DSwipe {
    */
   swipeThreshold = input<number>(50, { alias: 'threshold' });
   /** Whether the swipe gesture is disabled. */
-  disabled = input<boolean, boolean | string>(false, {
-    transform: (v) => coerceBooleanProperty(v),
+  disabled = input<boolean, BooleanInput>(false, {
+    transform: coerceBooleanProperty,
   });
   /** Emits the current swipe distance in pixels as the user is dragging. */
   swiping = output<number>();

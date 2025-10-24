@@ -11,8 +11,10 @@ import {
 } from '@angular/core';
 import { ContextualValue, DCellContext, DCellJustify } from '../../models';
 import {
+  BooleanInput,
   coerceBooleanProperty,
   coerceNumberProperty,
+  NumberInput,
 } from '@angular/cdk/coercion';
 
 /**
@@ -82,13 +84,13 @@ abstract class DStaticInputsCell {
   >;
 
   /** Cell's colspan attribute value */
-  colspan = input<number, number | string>(undefined, {
-    transform: (v: string | number | undefined) => coerceNumberProperty(v),
+  colspan = input<number, NumberInput>(undefined, {
+    transform: coerceNumberProperty,
   });
 
   /** Cell's rowspan attribute value */
-  rowspan = input<number, number | string>(undefined, {
-    transform: (v: string | number | undefined) => coerceNumberProperty(v),
+  rowspan = input<number, NumberInput>(undefined, {
+    transform: coerceNumberProperty,
   });
 
   /** Cell's text alignment */
@@ -163,23 +165,23 @@ export class DCellDef<T = unknown> implements DTableCellDef<T> {
   selector: '[d-cell]',
 })
 export class DCell<T = unknown> {
-  classList = input<ContextualValue<T>, string | string[] | ContextualValue<any>>(
-    undefined,
-    {
-      alias: 'tdClass',
-      transform: (
-        value: string | string[] | ContextualValue<any> | undefined
-      ) => {
-        if (value === undefined) return;
+  classList = input<
+    ContextualValue<T>,
+    string | string[] | ContextualValue<any>
+  >(undefined, {
+    alias: 'tdClass',
+    transform: (
+      value: string | string[] | ContextualValue<any> | undefined
+    ) => {
+      if (value === undefined) return;
 
-        if (value instanceof ContextualValue) return value;
+      if (value instanceof ContextualValue) return value;
 
-        const values = [value].flat().filter(Boolean);
+      const values = [value].flat().filter(Boolean);
 
-        return new ContextualValue(values);
-      },
-    }
-  );
+      return new ContextualValue(values);
+    },
+  });
 
   colspan = input<ContextualValue<T>, number | string | ContextualValue<any>>(
     undefined,
@@ -291,14 +293,12 @@ export class DFooterCell extends DStaticInputsCell {
       [value].flat().filter(Boolean).join(' '),
   });
 
-  sticky = input<boolean, boolean | string>(undefined, {
-    transform: (value: boolean | string | undefined) =>
-      value === undefined ? undefined : coerceBooleanProperty(value),
+  sticky = input<boolean, BooleanInput>(undefined, {
+    transform: coerceBooleanProperty,
   });
 
-  stickyEnd = input<boolean, boolean | string>(undefined, {
-    transform: (value: boolean | string | undefined) =>
-      value === undefined ? undefined : coerceBooleanProperty(value),
+  stickyEnd = input<boolean, BooleanInput>(undefined, {
+    transform: coerceBooleanProperty,
   });
 
   constructor() {
@@ -344,14 +344,12 @@ export class DAltHeaderCell extends DStaticInputsCell implements CanStickCell {
       [value].flat().filter(Boolean).join(' '),
   });
 
-  sticky = input<boolean, boolean | string>(undefined, {
-    transform: (value: boolean | string | undefined) =>
-      value === undefined ? undefined : coerceBooleanProperty(value),
+  sticky = input<boolean, BooleanInput>(undefined, {
+    transform: coerceBooleanProperty,
   });
 
-  stickyEnd = input<boolean, boolean | string>(undefined, {
-    transform: (value: boolean | string | undefined) =>
-      value === undefined ? undefined : coerceBooleanProperty(value),
+  stickyEnd = input<boolean, BooleanInput>(undefined, {
+    transform: coerceBooleanProperty,
   });
 
   constructor() {

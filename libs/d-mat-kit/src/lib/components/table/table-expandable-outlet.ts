@@ -6,10 +6,11 @@ import {
   inject,
   input,
   Renderer2,
+  viewChild,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 import { DTable } from './table';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged } from 'rxjs';
@@ -45,12 +46,13 @@ export class DTableExpandableOutlet<T> {
   /** Context for the row template, typically the data item of type `T`. */
   context = input.required<T>();
   /** Whether the expandable row is currently expanded. */
-  expanded = input<boolean, boolean | string>(false, {
-    transform: (value: string | boolean) => coerceBooleanProperty(value),
+  expanded = input<boolean, BooleanInput>(false, {
+    transform: coerceBooleanProperty,
   });
 
-  @ViewChild('viewContainer', { read: ViewContainerRef })
-  private readonly _viewContainerRef: ViewContainerRef;
+  private readonly _viewContainerRef = viewChild.required('viewContainer', {
+    read: ViewContainerRef,
+  });
 
   private _resizeObserver: ResizeObserver;
   private _table = inject(DTable);
@@ -103,7 +105,7 @@ export class DTableExpandableOutlet<T> {
           if (event.propertyName === 'opacity') {
             removeListenerFn?.();
 
-            this._viewContainerRef.clear();
+            this._viewContainerRef().clear();
             this._viewRef = null;
           }
         };
@@ -138,7 +140,7 @@ export class DTableExpandableOutlet<T> {
   }
 
   private createEmbeddedView(): EmbeddedViewRef<{ $implicit: T }> {
-    return this._viewContainerRef.createEmbeddedView(
+    return this._viewContainerRef().createEmbeddedView(
       this.expandableRowDef.template,
       {
         $implicit: this.context(),

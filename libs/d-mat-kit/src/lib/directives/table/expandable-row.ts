@@ -1,4 +1,4 @@
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   computed,
   Directive,
@@ -54,7 +54,7 @@ export class DExpandableRowDef<T> {
 
   /** Cell's class attribute value */
   get classList() {
-    return computed(() => this._expandableCell()?.classList() || []);
+    return computed(() => this._expandableCell()?.classList() || '');
   }
 
   /** Whether the expandable row content should stick and resize on table width changes */
@@ -71,17 +71,16 @@ export class DExpandableCell {
   private readonly _defaultOptions = inject(TABLE_OPTIONS);
 
   /** Cell's class attribute value */
-  classList = input<string[], string | string[]>([], {
+  classList = input<string, string | string[]>('', {
     alias: 'tdClass',
-    transform: (value: string | string[]) => [value].flat().filter(Boolean),
+    transform: (value: string | string[]) =>
+      [value].flat().filter(Boolean).join(' '),
   });
 
   /** Whether the expandable row content should stick and resize on table width changes */
-  sticky = input<boolean, boolean | string>(
+  sticky = input<boolean, BooleanInput>(
     this._defaultOptions.expandableRow.sticky,
-    {
-      transform: (value: string | boolean) => coerceBooleanProperty(value),
-    }
+    { transform: coerceBooleanProperty }
   );
 
   constructor() {

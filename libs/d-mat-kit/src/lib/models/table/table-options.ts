@@ -281,6 +281,8 @@ abstract class DRowOptions<T extends DStaticInputsCellDef & CanStickCell> {
     const cellDefsMap = new Map<string, T>();
 
     for (const cellDef of cellDefs) {
+      console.log(cellDef)
+
       const columnName = cellDef.columnName();
 
       if (cellDefsMap.has(columnName)) continue;

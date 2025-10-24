@@ -22,14 +22,12 @@ import { DNotification, DTableModule, DMenuTrigger } from '@duycaotu/d-mat-kit';
       [dataSource]="[]"
     >
       <ng-container dAltHeaderRow="hehe" trClass="bg-red-500">
-        <ng-container *dAltHeaderCellDef="'column1'">alt header</ng-container>
+        <ng-container *dAltHeaderCellDef="'column1'" d-alt-header-cell
+          >alt header</ng-container
+        >
       </ng-container>
     </d-table>
   `,
-  styles: [
-    `
-    `,
-  ],
 })
 export class ComponentViewer {
   constructor() {
