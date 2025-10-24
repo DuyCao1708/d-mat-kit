@@ -79,6 +79,7 @@ const DEFAULT_TABLE_INTL: DTableIntl = {
 const DEFAULT_TABLE_OPTIONS: DTableOptions = {
   stickyDefaultHeaderRow: false,
   expandIfSingleRow: true,
+  useDefaultNoDataRow: true,
   expandableRow: {
     sticky: true,
     columnName: 'expandedDetail',

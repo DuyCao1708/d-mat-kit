@@ -23,7 +23,7 @@ import { DNotification, DTableModule, DMenuTrigger } from '@duycaotu/d-mat-kit';
 
     <d-table
       [columns]="[{ name: 'column1', header: ' hehe' }]"
-      [dataSource]="[{ column1: '1231231' }]"
+      [dataSource]="[]"
     ></d-table>
   `,
   styles: ``,
