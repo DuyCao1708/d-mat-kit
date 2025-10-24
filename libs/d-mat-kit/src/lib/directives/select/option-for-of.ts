@@ -10,6 +10,8 @@ import {
   ListRange,
 } from '@angular/cdk/collections';
 import {
+  AfterContentInit,
+  AfterViewInit,
   computed,
   Directive,
   DoCheck,
@@ -79,7 +81,9 @@ type DOptionForLoadFunction = ((...args: any[]) => void) | undefined;
     },
   ],
 })
-export class DOptionForOf<T> implements CollectionViewer, DoCheck, OnDestroy {
+export class DOptionForOf<T>
+  implements CollectionViewer, DoCheck, AfterContentInit, OnDestroy
+{
   private _templateRef = inject(TemplateRef<any>);
   private _viewContainerRef = inject(ViewContainerRef);
   private _differs = inject(IterableDiffers);
@@ -200,6 +204,21 @@ export class DOptionForOf<T> implements CollectionViewer, DoCheck, OnDestroy {
       }
       this._needsUpdate = false;
     }
+  }
+
+  ngAfterContentInit() {
+    // const matOptions$ = this._matSelect.options.changes.pipe(
+    //       map(() => this._matSelect.options.toArray())
+    //     );
+    
+    //     const selectedValues$ = this._matSelect.valueChange.pipe(
+    //       startWith(this._matSelect.value),
+    //       map(() => [this._matSelect.value].flat().filter(Boolean))
+    //     );
+    
+    //     combineLatest([selectedValues$, matOptions$])
+    //       .pipe(takeUntilDestroyed(this._destroyRef))
+    //       .subscribe((changes) => this.renderHiddenOptions(...changes));
   }
 
   ngOnDestroy() {

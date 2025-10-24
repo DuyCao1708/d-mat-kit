@@ -30,7 +30,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 
     <mat-form-field>
       <mat-label>Toppings</mat-label>
-      <mat-select multiple>
+      <mat-select multiple [value]="['hehe_1']">
         <!-- <cdk-virtual-scroll-viewport
           itemSize="48"
           minBufferPx="480"
