@@ -19,12 +19,15 @@
   --d-toast-container-width: 380px;
 }
 
-.d-toast-dialog-panel {
-  .mat-mdc-dialog-surface {
-    overflow: visible;
+.d-toasts-snack-bar-container {
+  &.mat-snack-bar-container-animations-enabled.mat-snack-bar-container-enter {
+    animation: none;
   }
 
-  --mat-dialog-container-color: transparent;
+  .mat-mdc-snackbar-surface {
+    box-shadow: none;
+    --mat-snack-bar-container-color: transparent;
+  }
 }
 
 @keyframes dToastSlideInLeft {
