@@ -28,6 +28,9 @@ export abstract class DRow<T extends DStaticInputsCellDef & CanStickCell> {
   /** Whether the row is sticky. */
   abstract sticky: InputSignalWithTransform<boolean, string | boolean>;
 
+  /** Row's class attribute value */
+  abstract classList: InputSignal<string>;
+
   /** The list of cell definitions within this row content. */
   abstract contentCellDefs: Signal<readonly T[]>;
 
@@ -80,6 +83,8 @@ export class DAltHeaderRow extends DRow<DAltHeaderCellDef> {
     transform: (value: string | boolean) => coerceBooleanProperty(value),
   });
 
+  classList = input<string>('', { alias: 'trClass' });
+
   contentCellDefs = contentChildren(DAltHeaderCellDef);
 }
 
@@ -91,6 +96,8 @@ export class DFooterRow extends DRow<DFooterCellDef> {
   sticky = input<boolean, boolean | string>(false, {
     transform: (value: string | boolean) => coerceBooleanProperty(value),
   });
+
+  classList = input<string>('', { alias: 'trClass' });
 
   contentCellDefs = contentChildren(DFooterCellDef);
 }

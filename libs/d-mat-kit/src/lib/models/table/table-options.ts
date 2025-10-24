@@ -255,6 +255,7 @@ export class DColumnOptions<T> {
 abstract class DRowOptions<T extends DStaticInputsCellDef & CanStickCell> {
   name: string;
   sticky: boolean;
+  classList: string;
 
   abstract get columnsNames(): string[];
 
@@ -269,6 +270,7 @@ abstract class DRowOptions<T extends DStaticInputsCellDef & CanStickCell> {
   ) {
     this.name = row.rowName();
     this.sticky = row.sticky();
+    this.classList = row.classList();
   }
 
   protected _generateCellsOptions(

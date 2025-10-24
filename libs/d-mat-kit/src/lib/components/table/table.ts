@@ -310,6 +310,7 @@ export class DCellBinding {
           altHeaderRow.columnsNames;
           sticky: altHeaderRow.sticky
         "
+        [class]="altHeaderRow.classList"
       ></tr>
       }
       <!--#endregion-->
@@ -385,6 +386,7 @@ export class DCellBinding {
       <tr
         mat-footer-row
         *matFooterRowDef="footerRow.columnsNames; sticky: footerRow.sticky"
+        [class]="footerRow.classList"
       ></tr>
       }
       <!--#endregion-->
@@ -540,7 +542,9 @@ export class DTable<T = unknown> {
   private readonly _matFooterRowDefs =
     contentChildren<MatFooterRowDef>(MatFooterRowDef);
   private readonly _matNoDataRow = contentChild(MatNoDataRow);
-  protected readonly hasContentNoDataRow = computed(() => !!this._matNoDataRow());
+  protected readonly hasContentNoDataRow = computed(
+    () => !!this._matNoDataRow()
+  );
   private readonly _matColumnDefs = contentChildren(MatColumnDef);
   //#endregion
 

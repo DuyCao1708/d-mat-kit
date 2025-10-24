@@ -9,11 +9,7 @@ import { DNotification, DTableModule, DMenuTrigger } from '@duycaotu/d-mat-kit';
   template: `
     <p>component-viewer works!</p>
 
-    <button
-      [dMenuTriggerFor]="menu"
-      dMenuTriggerHoverable="true"
-      matButton
-    >
+    <button [dMenuTriggerFor]="menu" dMenuTriggerHoverable="true" matButton>
       trigger
     </button>
 
@@ -24,9 +20,16 @@ import { DNotification, DTableModule, DMenuTrigger } from '@duycaotu/d-mat-kit';
     <d-table
       [columns]="[{ name: 'column1', header: ' hehe' }]"
       [dataSource]="[]"
-    ></d-table>
+    >
+      <ng-container dAltHeaderRow="hehe" trClass="bg-red-500">
+        <ng-container *dAltHeaderCellDef="'column1'">alt header</ng-container>
+      </ng-container>
+    </d-table>
   `,
-  styles: ``,
+  styles: [
+    `
+    `,
+  ],
 })
 export class ComponentViewer {
   constructor() {
