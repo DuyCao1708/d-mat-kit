@@ -38,6 +38,10 @@ export class DInfiniteScroll {
   /** Callback function invoked when the panel scrolls beyond the defined trigger threshold. */
   dInfiniteScrollLoad = input<DInfiniteScrollLoadFunction>();
 
+  /**
+   * Configuration object that defines how the infinite scroll trigger behaves.
+   * Determines when the panel should load more items, based on the trigger type and threshold.
+   */
   dInfiniteScrollTrigger = input<
     DInfiniteScrollTrigger,
     DInfiniteScrollTriggerType | DInfiniteScrollTrigger
