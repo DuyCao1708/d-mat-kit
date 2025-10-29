@@ -9,6 +9,7 @@ import {
   fromEvent,
   map,
   Observable,
+  of,
   switchMap,
 } from 'rxjs';
 
@@ -24,12 +25,7 @@ type DInfiniteScrollTrigger = {
 };
 
 @Directive({
-  selector: `
-    mat-autocomplete[dInfiniteScroll],
-    mat-autocomplete[dInfiniteScrollLoad], 
-    mat-select[dInfiniteScroll],
-    mat-select[dInfiniteScrollLoad]
-  `,
+  selector: `[dInfiniteScrollLoad], [dInfiniteScroll]`,
 })
 export class DInfiniteScroll {
   /** Emits whenever the overlay panel changes. */
@@ -49,6 +45,8 @@ export class DInfiniteScroll {
     { type: 'index', threshold: -10 },
     { transform: coerceInfiniteScrollLoadTriggerProperty }
   );
+
+  private _isMatSelectOrAutocomplete = true;
 
   constructor() {
     const matSelect = inject(MatSelect, { optional: true });
@@ -70,8 +68,10 @@ export class DInfiniteScroll {
         filter(Boolean)
       );
     } else {
-      throw new Error(
-        '[dInfiniteScroll] must be used inside a MatSelect or MatAutocomplete component with an overlay panel.'
+      this._isMatSelectOrAutocomplete = false;
+      this._panelElementRefChanges = of(inject(ElementRef)).pipe(
+        takeUntilDestroyed(),
+        filter(Boolean)
       );
     }
 
@@ -99,13 +99,18 @@ export class DInfiniteScroll {
   }
 
   private shouldLoadByIndex(element: HTMLElement): boolean {
-    const matOptions = element.querySelectorAll('.mat-mdc-option');
-    const total = matOptions.length;
+    let children;
+
+    if (this._isMatSelectOrAutocomplete)
+      children = element.querySelectorAll('.mat-mdc-option');
+    else children = element.querySelectorAll(':scope > *');
+
+    const total = children.length;
 
     if (total === 0) return false;
 
-    const lastVisibleIndex = Array.from(matOptions).findIndex((optionEl) => {
-      const htmlElement = optionEl as HTMLElement;
+    const lastVisibleIndex = Array.from(children).findIndex((el) => {
+      const htmlElement = el as HTMLElement;
       const optionBottom = htmlElement.offsetTop + htmlElement.offsetHeight;
       return optionBottom > element.scrollTop + element.clientHeight;
     });
