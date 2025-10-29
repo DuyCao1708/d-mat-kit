@@ -1,17 +1,17 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Component, inject } from '@angular/core';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import {
   DNotification,
   DTableModule,
   DMenuTrigger,
-  DVirtualOptionForOf,
-  DOptionForOf,
+  DInfiniteScroll,
 } from '@duycaotu/d-mat-kit';
-import { BehaviorSubject, Subject } from 'rxjs';
 
 @Component({
   selector: 'component-viewer',
@@ -23,28 +23,48 @@ import { BehaviorSubject, Subject } from 'rxjs';
     MatFormFieldModule,
     MatSelectModule,
     ScrollingModule,
-    DOptionForOf,
+    DInfiniteScroll,
+    MatAutocompleteModule,
+    MatInput,
   ],
   template: `
     <p>component-viewer works!</p>
 
     <mat-form-field>
       <mat-label>Toppings</mat-label>
-      <mat-select multiple [value]="['hehe_1']">
+      <mat-select multiple [value]="['hehe_1']" [dInfiniteScrollLoad]="test">
         <!-- <cdk-virtual-scroll-viewport
           itemSize="48"
           minBufferPx="480"
           maxBufferPx="480"
           style="height: 200px"
         > -->
-        <mat-option
-          *dOptionFor="let option of options; load: test"
-          [value]="option"
-        >
-          {{ option }}
-        </mat-option>
+        @for(option of options; track option.value ) {
+        <mat-option [value]="option.value">{{ option.text }}</mat-option>
+        }
+
         <!-- </cdk-virtual-scroll-viewport> -->
       </mat-select>
+    </mat-form-field>
+
+    <mat-form-field style="margin-left: 16px">
+      <mat-label>Toppings</mat-label>
+      <input
+        type="text"
+        placeholder="Pick one"
+        aria-label="Number"
+        matInput
+        [matAutocomplete]="auto"
+      />
+      <mat-autocomplete
+        autoActiveFirstOption
+        #auto="matAutocomplete"
+        [dInfiniteScrollLoad]="test"
+      >
+        @for (option of options; track option.value) {
+        <mat-option [value]="option">{{ option.text }}</mat-option>
+        }
+      </mat-autocomplete>
     </mat-form-field>
 
     <button [dMenuTriggerFor]="menu" dMenuTriggerHoverable="true" matButton>
@@ -58,8 +78,6 @@ import { BehaviorSubject, Subject } from 'rxjs';
     <d-table
       [columns]="[{ name: 'column1', header: ' hehe' }]"
       [dataSource]="[{ column1: '1231231' }]"
-    >
-      [dataSource]="[]"
     >
       <ng-container dAltHeaderRow="hehe" trClass="bg-red-500">
         <ng-container *dAltHeaderCellDef="'column1'" d-alt-header-cell
@@ -78,7 +96,10 @@ export class ComponentViewer {
     });
   }
 
-  options = Array.from({ length: 100 }).map((_, i) => `hehe_${i}`);
+  options = Array.from({ length: 100 }).map((_, i) => ({
+    value: i,
+    text: `hehe_${i}`,
+  }));
 
   test = (v: any) => {
     console.log('scrolled to end');
@@ -86,7 +107,7 @@ export class ComponentViewer {
     this.options = [
       ...this.options.concat(
         ...Array.from({ length: 200 })
-          .map((_, i) => `hehe_${i}`)
+          .map((_, i) => ({ value: i, text: `hehe_${i}` }))
           .slice(100)
       ),
     ];
