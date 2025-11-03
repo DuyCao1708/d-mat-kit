@@ -16,6 +16,7 @@ type FileValue = File | File[] | FileList | null | undefined;
 
 type FileCompareFn = (f1: File, f2: File) => boolean;
 
+/** Component handles file uploads via click, drag-and-drop or paste actions. */
 @Component({
   selector: 'd-file-upload',
   template: `
@@ -28,6 +29,7 @@ type FileCompareFn = (f1: File, f2: File) => boolean;
       [accept]="accept()"
       [disabled]="disabled"
       (change)="_setValue($any($event.target).files)"
+      (cancel)="cancel.emit()"
     />
   `,
   styles: [
@@ -53,19 +55,39 @@ export class FileUpload implements ControlValueAccessor {
   private _fileInput =
     viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
 
+  /**
+   * Determines if multiple file selection is allowed.
+   * Default is `true`.
+   *
+   * @REFERNCE https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/multiple
+   */
   multiple = input<boolean, BooleanInput>(true, {
     transform: coerceBooleanProperty,
   });
 
+  /**
+   * Accepted file types for upload.
+   *
+   * @REFERENCE https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/accept
+   */
   accept = input<string>('*');
 
+  /**
+   * Determines whether duplicate files are allowed.
+   * Default is `false`.
+   */
   canDuplicate = input<boolean, BooleanInput>(false, {
     transform: coerceBooleanProperty,
   });
 
+  /**
+   * Function to compare two files to check for duplicates.
+   * Default compares files by their name.
+   */
   compareWith = input<FileCompareFn>((f1, f2) => f1.name === f2.name);
 
   private _disabled = false;
+  /** Whether the file upload is disabled. */
   @Input({ transform: coerceBooleanProperty })
   set disabled(value: boolean) {
     this._disabled = value;
@@ -74,6 +96,7 @@ export class FileUpload implements ControlValueAccessor {
     return this._disabled;
   }
 
+  /** The current value of the file upload. */
   @Input()
   get value() {
     return this._value;
@@ -83,15 +106,28 @@ export class FileUpload implements ControlValueAccessor {
   }
   private _value: File[] | File | undefined;
 
+  /** Event emitted when invalid files (not accepted) are detected. */
   invalidFormat = output<File[]>();
 
+  /** Event emitted when duplicate files are detected. */
   duplicate = output<File[]>();
 
+  /** Event emitted when no file is selected. */
   noFileSelected = output<void>();
 
+  /** Event emitted whenever the value changes. */
   valueChange = output<FileValue>();
 
+  /**
+   * Event emitted whenever the user does not change their selection, reselecting the previously selected files.
+   * The cancel event is also fired when the file picker dialog gets closed, or canceled, via the `cancel` button or the `escape` key
+   * */
+  cancel = output<void>();
+
+  /** Callback registered via ControlValueAccessor to notify form value changes. */
   _onChange: (value: FileValue) => void = () => {};
+
+  /** Callback registered via ControlValueAccessor to notify when the component is touched. */
   _onTouched: () => void = () => {};
 
   private _isWritingValue = false;
@@ -138,6 +174,7 @@ export class FileUpload implements ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
+  /** Handles files pasted from clipboard. */
   _setValueOnPaste(event: ClipboardEvent) {
     if (this.disabled) return;
 
@@ -157,6 +194,7 @@ export class FileUpload implements ControlValueAccessor {
     this._setValue(files);
   }
 
+  /** Handles files dropped via drag-and-drop. */
   _setValueOnDrop(event: DragEvent) {
     // To prevent opening file by browser
     event.preventDefault();
@@ -167,12 +205,14 @@ export class FileUpload implements ControlValueAccessor {
     this._setValue(fileList);
   }
 
+  /** Opens the hidden file input dialog. */
   _openDialog() {
     if (!this.disabled) {
       this._fileInput().nativeElement.click();
     }
   }
 
+  /** Core method to set value programmatically or from user input. */
   _setValue(value: FileValue) {
     if (
       // For null & undefined check
@@ -233,7 +273,7 @@ export class FileUpload implements ControlValueAccessor {
       ? duplicatedFiles.concat(newFiles)
       : acceptedFiles;
 
-    this._value = value;
+    (this._value as File[]).push(...value);
 
     if (!this._isWritingValue) {
       this._onChange(this.value);
