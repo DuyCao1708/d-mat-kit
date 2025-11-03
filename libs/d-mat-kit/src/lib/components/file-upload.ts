@@ -102,9 +102,9 @@ export class FileUpload implements ControlValueAccessor {
     return this._value;
   }
   set value(value: FileValue) {
-    this._setValue(value);
+    this.writeValue(value);
   }
-  private _value: File[] | File | undefined;
+  private _value: File[] | File | undefined | null;
 
   /** Event emitted when invalid files (not accepted) are detected. */
   invalidFormat = output<File[]>();
@@ -130,30 +130,16 @@ export class FileUpload implements ControlValueAccessor {
   /** Callback registered via ControlValueAccessor to notify when the component is touched. */
   _onTouched: () => void = () => {};
 
-  private _isWritingValue = false;
-
   constructor() {
     const ngControl = inject(NgControl, { optional: true });
 
     if (ngControl) ngControl.valueAccessor = this;
   }
 
-  ngOnInit() {
-    if (this.multiple()) {
-      this._value = [];
-    }
-  }
-
   writeValue(value: FileValue): void {
-    // If formControl is reset, instantly set value without emit events
-    if (!value || (!(value instanceof File) && value.length < 1)) {
-      this._value = this.multiple() ? [] : undefined;
-      return;
-    }
-
-    this._isWritingValue = true;
-    this._setValue(value);
-    this._isWritingValue = false;
+    const files = this.fileValueToArray(value);
+    if (this.multiple()) this._value = files;
+    else this._value = files[0];
   }
 
   registerOnChange(fn: any): void {
@@ -223,10 +209,7 @@ export class FileUpload implements ControlValueAccessor {
       return this.noFileSelected.emit();
 
     if (this.multiple()) {
-      const files =
-        value instanceof FileList
-          ? Array.from(value)
-          : [value].flat().filter(Boolean);
+      const files = this.fileValueToArray(value);
 
       this.setMultiFiles(files);
     } else this.setSingleFile(Array.from(value as FileList)[0]);
@@ -235,21 +218,10 @@ export class FileUpload implements ControlValueAccessor {
   private setSingleFile(file: File) {
     if (!this.isAcceptable(file)) return this.invalidFormat.emit([file]);
 
-    const currentFile = this.value as File | undefined;
-
-    if (currentFile) {
-      const isDuplicated = this.compareWith()(file, currentFile);
-
-      if (!this.canDuplicate() && isDuplicated)
-        return this.duplicate.emit([file]);
-    }
-
     this._value = file;
 
-    if (!this._isWritingValue) {
-      this._onChange(this.value);
-      this.valueChange.emit(this.value);
-    }
+    this._onChange(this.value);
+    this.valueChange.emit(this.value);
   }
 
   private setMultiFiles(files: File[]) {
@@ -262,23 +234,28 @@ export class FileUpload implements ControlValueAccessor {
 
     if (!acceptedFiles.length) return;
 
+    if (!Array.isArray(this._value)) this._value = [];
+
     const [duplicatedFiles, newFiles] = this.splitFiles(
       acceptedFiles,
-      this.compareWith()
+      (file: File) =>
+        (this.value as File[]).some((existingFile) =>
+          this.compareWith()(existingFile, file)
+        )
     );
 
     if (duplicatedFiles.length) this.duplicate.emit(duplicatedFiles);
 
+    if (!this.canDuplicate() && !newFiles.length) return;
+
     const value = this.canDuplicate()
       ? duplicatedFiles.concat(newFiles)
-      : acceptedFiles;
+      : newFiles;
 
-    (this._value as File[]).push(...value);
+    this._value.push(...value);
 
-    if (!this._isWritingValue) {
-      this._onChange(this.value);
-      this.valueChange.emit(this.value);
-    }
+    this._onChange(this.value);
+    this.valueChange.emit(this.value);
   }
 
   private isAcceptable = (file: File): boolean => {
@@ -308,7 +285,7 @@ export class FileUpload implements ControlValueAccessor {
 
   private splitFiles(
     files: File[],
-    splitFn: (...args: any[]) => boolean
+    splitFn: (file: File) => boolean
   ): // [Truthy files[], Falsy files[]]
   [File[], File[]] {
     return files.reduce(
@@ -322,6 +299,12 @@ export class FileUpload implements ControlValueAccessor {
       },
       [[], []] as [File[], File[]]
     );
+  }
+
+  private fileValueToArray(value: FileValue): File[] {
+    return value instanceof FileList
+      ? Array.from(value)
+      : ([value].flat().filter(Boolean) as File[]);
   }
 }
 

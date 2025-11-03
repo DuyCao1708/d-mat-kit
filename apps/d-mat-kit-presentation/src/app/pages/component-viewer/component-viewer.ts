@@ -73,7 +73,6 @@ import {
 
     <d-file-upload
       style="width: 50px; height: 50px; background-color: red"
-      multiple="false"
       [formControl]="formControl"
     >
       Tải ảnh ở đây
