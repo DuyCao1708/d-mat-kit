@@ -1,5 +1,6 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Component, inject } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,6 +12,7 @@ import {
   DTableModule,
   DMenuTrigger,
   DInfiniteScroll,
+  FileUpload,
 } from '@duycaotu/d-mat-kit';
 
 @Component({
@@ -26,6 +28,8 @@ import {
     DInfiniteScroll,
     MatAutocompleteModule,
     MatInput,
+    FileUpload,
+    ReactiveFormsModule,
   ],
   template: `
     <p>component-viewer works!</p>
@@ -67,6 +71,14 @@ import {
       </mat-autocomplete>
     </mat-form-field>
 
+    <d-file-upload
+      style="width: 50px; height: 50px; background-color: red"
+      multiple="false"
+      [formControl]="formControl"
+    >
+      Tải ảnh ở đây
+    </d-file-upload>
+
     <button [dMenuTriggerFor]="menu" dMenuTriggerHoverable="true" matButton>
       trigger
     </button>
@@ -94,7 +106,11 @@ export class ComponentViewer {
       message: 'heheheh',
       timeout: 1000,
     });
+
+    this.formControl.valueChanges.subscribe(console.log)
   }
+
+  formControl = new FormControl(null);
 
   options = Array.from({ length: 100 }).map((_, i) => ({
     value: i,
