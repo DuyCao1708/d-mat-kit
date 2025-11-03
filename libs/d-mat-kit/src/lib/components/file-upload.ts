@@ -9,12 +9,32 @@ import {
   Renderer2,
   viewChild,
 } from '@angular/core';
-import { ControlValueAccessor, NgControl } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogActions,
+  MatDialogClose,
+  MatDialogContent,
+  MatDialogTitle,
+} from '@angular/material/dialog';
+import { MatRadioModule } from '@angular/material/radio';
+import { FILE_UPLOAD_INTL } from '../tokens/intl';
+import {
+  DFileUploadIntl,
+  DFileUploadOptions,
+  FileUploadOptionResult,
+} from '../models/file-upload';
+import { FILE_UPLOAD_OPTIONS } from '../tokens/config';
+import { MatButtonModule } from '@angular/material/button';
+import { Observable } from 'rxjs';
+import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
 
 type FileValue = File | File[] | FileList | null | undefined;
 
 type FileCompareFn = (f1: File, f2: File) => boolean;
+
+const DEFAULT_SCREENSHOT_IMAGE_NAMES = ['image.png', 'ảnh.png'];
 
 /** Component handles file uploads via click, drag-and-drop or paste actions. */
 @Component({
@@ -54,6 +74,8 @@ export class FileUpload implements ControlValueAccessor {
   private _renderer = inject(Renderer2);
   private _fileInput =
     viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
+  private _matDialog = inject(MatDialog);
+  private _defaultOptions = inject(FILE_UPLOAD_OPTIONS);
 
   /**
    * Determines if multiple file selection is allowed.
@@ -73,18 +95,16 @@ export class FileUpload implements ControlValueAccessor {
   accept = input<string>('*');
 
   /**
-   * Determines whether duplicate files are allowed.
-   * Default is `false`.
-   */
-  canDuplicate = input<boolean, BooleanInput>(false, {
-    transform: coerceBooleanProperty,
-  });
-
-  /**
    * Function to compare two files to check for duplicates.
    * Default compares files by their name.
    */
   compareWith = input<FileCompareFn>((f1, f2) => f1.name === f2.name);
+
+  /** Whether ignore the duplicate uploaded files */
+  ignoreDuplicates = input<boolean, BooleanInput>(
+    this._defaultOptions.ignoreDuplicate,
+    { transform: coerceBooleanProperty }
+  );
 
   private _disabled = false;
   /** Whether the file upload is disabled. */
@@ -170,9 +190,7 @@ export class FileUpload implements ControlValueAccessor {
         DEFAULT_SCREENSHOT_IMAGE_NAMES.includes(file.name)
           ? `${new Date().getTime()}.png`
           : file.name,
-        {
-          type: file.type,
-        }
+        { type: file.type }
       );
       return newFile;
     });
@@ -244,18 +262,33 @@ export class FileUpload implements ControlValueAccessor {
         )
     );
 
-    if (duplicatedFiles.length) this.duplicate.emit(duplicatedFiles);
+    console.log(duplicatedFiles);
+    if (duplicatedFiles.length) {
+      this.duplicate.emit(duplicatedFiles);
 
-    if (!this.canDuplicate() && !newFiles.length) return;
+      if (!this.ignoreDuplicates()) {
+        this.openOptionDialog(duplicatedFiles).subscribe((result) => {
+          let value;
 
-    const value = this.canDuplicate()
-      ? duplicatedFiles.concat(newFiles)
-      : newFiles;
+          if (result === 'keep') {
+          } else {
+          }
+
+          // this._value.push(value);
+        });
+      }
+    }
+
+    // if (duplicatedFiles.length) this.duplicate.emit(duplicatedFiles);
+
+    // if (!this.canDuplicate() && !newFiles.length) return;
+
+    const value = newFiles;
 
     this._value.push(...value);
 
-    this._onChange(this.value);
-    this.valueChange.emit(this.value);
+    // this._onChange(this.value);
+    // this.valueChange.emit(this.value);
   }
 
   private isAcceptable = (file: File): boolean => {
@@ -306,6 +339,102 @@ export class FileUpload implements ControlValueAccessor {
       ? Array.from(value)
       : ([value].flat().filter(Boolean) as File[]);
   }
+
+  private openOptionDialog(
+    files: File[]
+  ): Observable<FileUploadOptionResult | undefined> {
+    return this._matDialog
+      .open<FileUploadOptionDialog, any, FileUploadOptionResult | undefined>(
+        FileUploadOptionDialog,
+        {
+          disableClose: true,
+          data: { files },
+        }
+      )
+      .afterClosed();
+  }
 }
 
-const DEFAULT_SCREENSHOT_IMAGE_NAMES = ['image.png', 'ảnh.png'];
+@Component({
+  selector: 'd-file-upload-option-dialog',
+  imports: [
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose,
+    MatRadioModule,
+    FormsModule,
+    MatButtonModule,
+    MarkdownComponent,
+  ],
+  template: `
+    <h2 mat-dialog-title [class]="titleClassList">{{ title }}</h2>
+
+    <mat-dialog-content>
+      <markdown>{{ message }}</markdown>
+
+      <div>
+        <mat-radio-group
+          class="d-file-upload-option-dialog-radio-group"
+          [(ngModel)]="selectedValue"
+        >
+          <mat-radio-button value="replace">
+            {{ replaceOptionLabel }}
+          </mat-radio-button>
+
+          <mat-radio-button value="keep">
+            {{ keepOptionLabel }}
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions>
+      <button matButton mat-dialog-close>
+        {{ buttonCancelLabel }}
+      </button>
+
+      <button matButton="filled" [mat-dialog-close]="selectedValue">
+        {{ buttonUploadLabel }}
+      </button>
+    </mat-dialog-actions>
+  `,
+  styles: [
+    `
+      .d-file-upload-option-dialog-radio-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 4px;
+      }
+    `,
+  ],
+  providers: [provideMarkdown()],
+})
+class FileUploadOptionDialog {
+  readonly message: string;
+  readonly buttonCancelLabel: string;
+  readonly buttonUploadLabel: string;
+  readonly titleClassList: string;
+  readonly title: string;
+  readonly replaceOptionLabel: string;
+  readonly keepOptionLabel: string;
+
+  selectedValue: FileUploadOptionResult;
+
+  constructor() {
+    const options = inject(FILE_UPLOAD_OPTIONS) as DFileUploadOptions;
+    this.selectedValue = options.defaultUploadOption;
+    this.titleClassList = options.uploadOptionsDialogTitleClass || '';
+
+    const intl = inject(FILE_UPLOAD_INTL) as DFileUploadIntl;
+    this.title = intl.uploadOptionsDialogTitle;
+    this.replaceOptionLabel = intl.replaceOptionLabel;
+    this.keepOptionLabel = intl.keepOptionLabel;
+    this.buttonCancelLabel = intl.buttonCancelLabel;
+    this.buttonUploadLabel = intl.buttonUploadLabel;
+
+    const data = inject(MAT_DIALOG_DATA) as { files: File[] };
+
+    this.message = intl.uploadOptionsDialogContentMessage(data.files);
+  }
+}
