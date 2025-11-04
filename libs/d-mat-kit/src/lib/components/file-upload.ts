@@ -32,8 +32,6 @@ import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
 
 type FileValue = File | File[] | FileList | null | undefined;
 
-type FileCompareFn = (f1: File, f2: File) => boolean;
-
 const DEFAULT_SCREENSHOT_IMAGE_NAMES = ['image.png', 'ảnh.png'];
 
 /** Component handles file uploads via click, drag-and-drop or paste actions. */
@@ -68,7 +66,7 @@ const DEFAULT_SCREENSHOT_IMAGE_NAMES = ['image.png', 'ảnh.png'];
     '(blur)': '_onTouched()',
   },
 })
-export class FileUpload implements ControlValueAccessor {
+export class DFileUpload implements ControlValueAccessor {
   private _elementRef = inject(ElementRef);
   private _renderer = inject(Renderer2);
   private _fileInput =
@@ -92,12 +90,6 @@ export class FileUpload implements ControlValueAccessor {
    * @REFERENCE https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/accept
    */
   accept = input<string>('*');
-
-  /**
-   * Function to compare two files to check for duplicates.
-   * Default compares files by their name.
-   */
-  compareWith = input<FileCompareFn>((f1, f2) => f1.name === f2.name);
 
   /** Whether ignore the duplicate uploaded files */
   ignoreDuplicates = input<boolean, BooleanInput>(
@@ -251,12 +243,17 @@ export class FileUpload implements ControlValueAccessor {
     const [duplicatedFiles, newFiles] = this.splitFiles(
       acceptedFiles,
       (file: File) =>
-        (this.value as File[]).some((existingFile) =>
-          this.compareWith()(existingFile, file)
+        (this.value as File[]).some(
+          (existingFile) => existingFile.name === file.name
         )
     );
 
     if (newFiles.length) this._value.push(...newFiles);
+
+    const finalize = () => {
+      this._onChange(this.value);
+      this.valueChange.emit(this.value);
+    };
 
     if (duplicatedFiles.length) {
       this.duplicate.emit(duplicatedFiles);
@@ -267,16 +264,14 @@ export class FileUpload implements ControlValueAccessor {
           else if (result === 'replace')
             this.setReplacementFiles(duplicatedFiles);
 
-          this._onChange(this.value);
-          this.valueChange.emit(this.value);
+          finalize();
         });
-      }
 
-      return;
+        return;
+      }
     }
 
-    this._onChange(this.value);
-    this.valueChange.emit(this.value);
+    finalize();
   }
 
   private isAcceptable = (file: File): boolean => {
@@ -479,3 +474,9 @@ class FileUploadOptionDialog {
     this.message = intl.uploadOptionsDialogContentMessage(data.files);
   }
 }
+
+@Component({
+  selector: 'd-file-upload-progress',
+  template: ``,
+})
+class FileUploadProgress {}
