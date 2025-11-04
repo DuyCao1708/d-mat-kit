@@ -13,6 +13,7 @@ import {
   DMenuTrigger,
   DInfiniteScroll,
   FileUpload,
+  FileUploadTrigger,
 } from '@duycaotu/d-mat-kit';
 
 @Component({
@@ -30,6 +31,7 @@ import {
     MatInput,
     FileUpload,
     ReactiveFormsModule,
+    FileUploadTrigger,
   ],
   template: `
     <p>component-viewer works!</p>
@@ -72,11 +74,16 @@ import {
     </mat-form-field>
 
     <d-file-upload
-      style="width: 50px; height: 50px; background-color: red"
+      #fileUploader
+      style="width: 100px; height: 100px; background-color: red"
       [formControl]="formControl"
     >
-      Tải ảnh ở đây
+      Kéo thả hoặc dán ảnh ở đây
     </d-file-upload>
+
+    <button matButton [dFileUploadTriggerFor]="fileUploader">
+      Hoặc click vào đây
+    </button>
 
     <button [dMenuTriggerFor]="menu" dMenuTriggerHoverable="true" matButton>
       trigger
@@ -106,7 +113,7 @@ export class ComponentViewer {
       timeout: 1000,
     });
 
-    this.formControl.valueChanges.subscribe(console.log)
+    this.formControl.valueChanges.subscribe(console.log);
   }
 
   formControl = new FormControl(null);

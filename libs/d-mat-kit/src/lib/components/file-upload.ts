@@ -66,7 +66,6 @@ const DEFAULT_SCREENSHOT_IMAGE_NAMES = ['image.png', 'ảnh.png'];
     '(drop)': '_setValueOnDrop($event)',
     '(paste)': '_setValueOnPaste($event)',
     '(blur)': '_onTouched()',
-    '(click)': '_openDialog()',
   },
 })
 export class FileUpload implements ControlValueAccessor {
@@ -184,16 +183,11 @@ export class FileUpload implements ControlValueAccessor {
   _setValueOnPaste(event: ClipboardEvent) {
     if (this.disabled) return;
 
-    const files = Array.from(event.clipboardData?.files || []).map((file) => {
-      const newFile = new File(
-        [file],
-        DEFAULT_SCREENSHOT_IMAGE_NAMES.includes(file.name)
-          ? `${new Date().getTime()}.png`
-          : file.name,
-        { type: file.type }
-      );
-      return newFile;
-    });
+    const files = Array.from(event.clipboardData?.files || []).map((file) =>
+      DEFAULT_SCREENSHOT_IMAGE_NAMES.includes(file.name)
+        ? this.renameFile(file, `${new Date().getTime()}.png`)
+        : file
+    );
 
     this._setValue(files);
   }
@@ -262,33 +256,27 @@ export class FileUpload implements ControlValueAccessor {
         )
     );
 
-    console.log(duplicatedFiles);
+    if (newFiles.length) this._value.push(...newFiles);
+
     if (duplicatedFiles.length) {
       this.duplicate.emit(duplicatedFiles);
 
       if (!this.ignoreDuplicates()) {
         this.openOptionDialog(duplicatedFiles).subscribe((result) => {
-          let value;
+          if (result === 'keep') this.setDuplicateFiles(duplicatedFiles);
+          else if (result === 'replace')
+            this.setReplacementFiles(duplicatedFiles);
 
-          if (result === 'keep') {
-          } else {
-          }
-
-          // this._value.push(value);
+          this._onChange(this.value);
+          this.valueChange.emit(this.value);
         });
       }
+
+      return;
     }
 
-    // if (duplicatedFiles.length) this.duplicate.emit(duplicatedFiles);
-
-    // if (!this.canDuplicate() && !newFiles.length) return;
-
-    const value = newFiles;
-
-    this._value.push(...value);
-
-    // this._onChange(this.value);
-    // this.valueChange.emit(this.value);
+    this._onChange(this.value);
+    this.valueChange.emit(this.value);
   }
 
   private isAcceptable = (file: File): boolean => {
@@ -352,6 +340,59 @@ export class FileUpload implements ControlValueAccessor {
         }
       )
       .afterClosed();
+  }
+
+  private setDuplicateFiles(files: File[]) {
+    const map = new Map<string, File[]>();
+    const currentFiles = this.value as File[];
+
+    currentFiles.forEach((file) => {
+      const baseName = this.getBaseName(file);
+
+      if (!map.has(baseName)) {
+        map.set(baseName, []);
+      }
+
+      map.get(baseName)!.push(file);
+    });
+
+    files.forEach((file) => {
+      const baseName = this.getBaseName(file);
+      const duplicates = map.get(baseName);
+
+      if (duplicates?.length) {
+        // Split name and extension
+        const match = baseName.match(/^(.*?)(\.[^.]+)?$/);
+        const nameWithoutExt = match?.[1] ?? baseName;
+        const ext = match?.[2] ?? '';
+
+        currentFiles.push(
+          this.renameFile(
+            file,
+            `${nameWithoutExt} (${duplicates.length})${ext}`
+          )
+        );
+      } else currentFiles.push(file);
+    });
+  }
+
+  private setReplacementFiles(files: File[]) {
+    files.forEach((file) => {
+      const currentFiles = this.value as File[];
+      const index = currentFiles.findIndex(
+        (existingFile) => existingFile.name === file.name
+      );
+
+      if (index > -1) currentFiles[index] = file;
+    });
+  }
+
+  private renameFile(file: File, newName: string): File {
+    return new File([file], newName, { type: file.type });
+  }
+
+  private getBaseName(file: File): string {
+    return file.name.replace(/\s?\(\d+\)(?=\.[^.]+$)/, '');
   }
 }
 
