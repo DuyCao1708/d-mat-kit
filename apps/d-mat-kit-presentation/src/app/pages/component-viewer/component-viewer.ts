@@ -1,4 +1,5 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -13,7 +14,9 @@ import {
   DMenuTrigger,
   DInfiniteScroll,
   DFileUploadModule,
+  DFileUploadProgress,
 } from '@duycaotu/d-mat-kit';
+import { map, of } from 'rxjs';
 
 @Component({
   selector: 'component-viewer',
@@ -80,6 +83,8 @@ import {
       <button matButton dFileUploadTrigger>Hoặc click vào đây</button>
     </d-file-upload>
 
+    <button matButton (click)="download()">download</button>
+
     <button [dMenuTriggerFor]="menu" dMenuTriggerHoverable="true" matButton>
       trigger
     </button>
@@ -101,6 +106,8 @@ import {
   `,
 })
 export class ComponentViewer {
+  private _progress = inject(DFileUploadProgress);
+
   constructor() {
     inject(DNotification).toast({
       type: 'warn',
@@ -108,10 +115,48 @@ export class ComponentViewer {
       timeout: 1000,
     });
 
-    this.formControl.valueChanges.subscribe(console.log);
+    setTimeout(
+      () =>
+        this._progress.track({
+          name: 'hehe',
+          type: 'application/pdf',
+          progress$: of({
+            type: HttpEventType.UploadProgress,
+            loaded: 50,
+            total: 100,
+          }),
+        }),
+      1000
+    );
+
+    const http = inject(HttpClient);
+
+    this.formControl.valueChanges.subscribe((files: File[] | null) => {
+      console.log(files);
+
+      for (let file of files || []) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const progress$ = http.post(
+          `https://api.escuelajs.co/api/v1/files/upload`,
+          formData,
+          {
+            reportProgress: true,
+            observe: 'events',
+          }
+        );
+
+        this._progress.track({
+          name: file.name,
+          type: file.type,
+          progress$,
+        });
+      }
+    });
   }
 
-  formControl = new FormControl(null);
+  formControl = new FormControl<File[] | null>(null);
 
   options = Array.from({ length: 100 }).map((_, i) => ({
     value: i,
@@ -131,4 +176,27 @@ export class ComponentViewer {
 
     console.log(this.options);
   };
+
+  download() {
+    const content = `#EXTM3U
+#EXTINF:123, Sample artist - Sample title
+http://www.example.com/music/sample.mp3
+#EXTINF:321,Example Artist - Example title
+http://www.example.com/music/example.mp3`;
+
+    // Tạo Blob với MIME type audio/x-mpegurl
+    const blob = new Blob([content], { type: 'audio/x-mpegurl' });
+
+    // Tạo URL tạm
+    const url = URL.createObjectURL(blob);
+
+    // Tạo thẻ <a> ẩn để download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'playlist.m3u'; // Hoặc playlist.m3u8
+    a.click();
+
+    // Giải phóng bộ nhớ
+    URL.revokeObjectURL(url);
+  }
 }

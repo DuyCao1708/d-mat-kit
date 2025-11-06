@@ -8,11 +8,16 @@ import {
 } from '../models';
 import {
   FILE_UPLOAD_OPTIONS,
+  FILE_UPLOAD_PROGRESS_OPTIONS,
   NOTIFICATION_OPTIONS,
   TABLE_OPTIONS,
 } from './config';
 import { FILE_UPLOAD_INTL, NOTIFICATION_INTL, TABLE_INTL } from './intl';
-import { DFileUploadIntl, DFileUploadOptions } from '../models/file-upload';
+import {
+  DFileUploadIntl,
+  DFileUploadOptions,
+  DFileUploadProgressConfig,
+} from '../models/file-upload';
 
 enum DMatKitFeatureKind {
   Notification = 0,
@@ -53,8 +58,8 @@ const DEFAULT_NOTIFICATION_INTL: DNotificationIntl = {
 /** Configures the notification feature with options and internationalization. */
 export const withNotification = (
   config?: Partial<{
-    options?: Partial<DNofiticationGlobalOptions>;
-    intl?: Partial<DNotificationIntl>;
+    options: Partial<DNofiticationGlobalOptions>;
+    intl: Partial<DNotificationIntl>;
   }>
 ): DMatKitFeature<DMatKitFeatureKind> => {
   const providers = [];
@@ -159,6 +164,13 @@ const DEFAULT_FILE_UPLOAD_OPTIONS: DFileUploadOptions = {
   ignoreDuplicate: false,
 };
 
+/** Default file upload progress configuration */
+const DEFAULT_FILE_UPLOAD_PROGRESS_OPTIONS: DFileUploadProgressConfig = {
+  horizontalPosition: 'right',
+  verticalPosition: 'bottom',
+  sideMargin: '24px',
+};
+
 /** Default file upload internationalization */
 const DEFAULT_FILE_UPLOAD_INTL: DFileUploadIntl = {
   uploadOptionsDialogTitle: 'Upload options',
@@ -179,8 +191,9 @@ const DEFAULT_FILE_UPLOAD_INTL: DFileUploadIntl = {
 /** Configures the file upload feature with options and internationalization. */
 export const withFileUpload = (
   config?: Partial<{
-    options?: Partial<DFileUploadOptions>;
-    intl?: Partial<DFileUploadIntl>;
+    options: Partial<DFileUploadOptions>;
+    progress: Partial<DFileUploadProgressConfig>;
+    intl: Partial<DFileUploadIntl>;
   }>
 ): DMatKitFeature<DMatKitFeatureKind> => {
   const providers = [];
@@ -188,6 +201,11 @@ export const withFileUpload = (
   providers.push({
     provide: FILE_UPLOAD_OPTIONS,
     useValue: { ...DEFAULT_FILE_UPLOAD_OPTIONS, ...config?.options },
+  });
+
+  providers.push({
+    provide: FILE_UPLOAD_PROGRESS_OPTIONS,
+    useValue: { ...DEFAULT_FILE_UPLOAD_PROGRESS_OPTIONS, ...config?.progress },
   });
 
   providers.push({

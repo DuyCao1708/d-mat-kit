@@ -11,6 +11,7 @@ import {
   withNotification,
   withTable,
 } from '@duycaotu/d-mat-kit';
+import { provideHttpClient } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,5 +19,6 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(appRoutes),
     provideDMatKit(withNotification(), withTable(), withFileUpload()),
+    provideHttpClient(),
   ],
 };

@@ -1,5 +1,5 @@
 import { Directive, inject, input } from '@angular/core';
-import { DFileUpload } from '../components/file-upload';
+import { DFileUpload } from '../components/file-upload/file-upload';
 
 /** Used to open file upload dialog on click event */
 @Directive({

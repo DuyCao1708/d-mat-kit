@@ -19,13 +19,11 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
-import { FILE_UPLOAD_INTL } from '../tokens/intl';
+import { FILE_UPLOAD_INTL } from '../../tokens/intl';
 import {
-  DFileUploadIntl,
-  DFileUploadOptions,
-  FileUploadOptionResult,
-} from '../models/file-upload';
-import { FILE_UPLOAD_OPTIONS } from '../tokens/config';
+  DFileUploadOptionResult,
+} from '../../models/file-upload';
+import { FILE_UPLOAD_OPTIONS } from '../../tokens/config';
 import { MatButtonModule } from '@angular/material/button';
 import { Observable } from 'rxjs';
 import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
@@ -325,10 +323,10 @@ export class DFileUpload implements ControlValueAccessor {
 
   private openOptionDialog(
     files: File[]
-  ): Observable<FileUploadOptionResult | undefined> {
+  ): Observable<DFileUploadOptionResult | undefined> {
     return this._matDialog
-      .open<FileUploadOptionDialog, any, FileUploadOptionResult | undefined>(
-        FileUploadOptionDialog,
+      .open<DFileUploadOptionDialog, any, DFileUploadOptionResult | undefined>(
+        DFileUploadOptionDialog,
         {
           disableClose: true,
           data: { files },
@@ -446,7 +444,7 @@ export class DFileUpload implements ControlValueAccessor {
   ],
   providers: [provideMarkdown()],
 })
-class FileUploadOptionDialog {
+class DFileUploadOptionDialog {
   readonly message: string;
   readonly buttonCancelLabel: string;
   readonly buttonUploadLabel: string;
@@ -455,28 +453,22 @@ class FileUploadOptionDialog {
   readonly replaceOptionLabel: string;
   readonly keepOptionLabel: string;
 
-  selectedValue: FileUploadOptionResult;
+  selectedValue: DFileUploadOptionResult;
 
   constructor() {
-    const options = inject(FILE_UPLOAD_OPTIONS) as DFileUploadOptions;
+    const options = inject(FILE_UPLOAD_OPTIONS);
     this.selectedValue = options.defaultUploadOption;
     this.titleClassList = options.uploadOptionsDialogTitleClass || '';
 
-    const intl = inject(FILE_UPLOAD_INTL) as DFileUploadIntl;
+    const intl = inject(FILE_UPLOAD_INTL);
     this.title = intl.uploadOptionsDialogTitle;
     this.replaceOptionLabel = intl.replaceOptionLabel;
     this.keepOptionLabel = intl.keepOptionLabel;
     this.buttonCancelLabel = intl.buttonCancelLabel;
     this.buttonUploadLabel = intl.buttonUploadLabel;
 
-    const data = inject(MAT_DIALOG_DATA) as { files: File[] };
+    const data = inject<{ files: File[] }>(MAT_DIALOG_DATA);
 
     this.message = intl.uploadOptionsDialogContentMessage(data.files);
   }
 }
-
-@Component({
-  selector: 'd-file-upload-progress',
-  template: ``,
-})
-class FileUploadProgress {}
