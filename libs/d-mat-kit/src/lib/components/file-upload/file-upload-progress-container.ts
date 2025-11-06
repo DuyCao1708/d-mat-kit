@@ -15,6 +15,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FILE_UPLOAD_PROGRESS_DATA } from '../../tokens/config';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
 import { _animationsDisabled } from '@angular/material/core';
+import { OverlayRef } from '@angular/cdk/overlay';
 
 type FileUploadStatus = 'uploading' | 'completed' | 'error';
 
@@ -37,7 +38,7 @@ type FileProgress = {
           <mat-icon>keyboard_arrow_down</mat-icon>
         </button>
 
-        <button matIconButton>
+        <button matIconButton (click)="exit()">
           <mat-icon>close</mat-icon>
         </button>
       </div>
@@ -177,9 +178,12 @@ type FileProgress = {
   ],
   host: {
     'animate.enter': 'd-file-upload-progress-animation-enter',
+    'animate.leave': 'd-file-upload-progress-animation-leave',
   },
 })
 export class DFileUploadProgressContainer {
+  private _overlayRef = inject(OverlayRef);
+
   readonly files = toSignal(
     inject(FILE_UPLOAD_PROGRESS_DATA).pipe(
       mergeMap(({ name, type, progress$ }) =>
@@ -204,6 +208,10 @@ export class DFileUploadProgressContainer {
     ),
     { initialValue: [] }
   );
+
+  exit() {
+    this._overlayRef.dispose();
+  }
 
   private mapHttpEventToFileProgress(
     name: string,
