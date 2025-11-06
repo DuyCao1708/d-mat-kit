@@ -1,7 +1,8 @@
 import { Direction } from '@angular/cdk/bidi';
-import { HttpEvent, HttpProgressEvent } from '@angular/common/http';
+import { HttpEvent } from '@angular/common/http';
 import { ViewContainerRef } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { OverlayRef } from '@angular/cdk/overlay';
 
 /** Value returned from the upload options dialog */
 export type DFileUploadOptionResult = 'replace' | 'keep';
@@ -43,6 +44,36 @@ export type DFileProgress = {
   /** An Observable that emits `HttpEvent<any>` objects, tracking the upload progress and response of the file. */
   progress$: Observable<HttpEvent<any>>;
 };
+
+/** Reference to a container dispatched from the file upload progress service. */
+export class DFileUploadProgressContainerRef {
+  /** Subject for notifying the user that the snack bar has been dismissed. */
+  private readonly _afterDismissed = new Subject<void>();
+
+  constructor(
+    private _overlayRef: OverlayRef
+  ) {
+    this._overlayRef.detachments().subscribe(() => this._finishDismiss());
+  }
+
+  /** Dismisses the container. */
+  dismiss(): void {
+    if (!this._afterDismissed.closed) {
+      this._finishDismiss();
+    }
+  }
+
+  /** Gets an observable that is notified when the container is finished closing. */
+  afterDismissed(): Observable<void> {
+    return this._afterDismissed.asObservable();
+  }
+
+  private _finishDismiss() {
+    this._overlayRef.dispose();
+    this._afterDismissed.next();
+    this._afterDismissed.complete();
+  }
+}
 
 /** Provides default options to upload files */
 export type DFileUploadOptions = {

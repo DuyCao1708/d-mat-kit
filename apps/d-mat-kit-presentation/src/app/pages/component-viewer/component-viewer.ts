@@ -1,5 +1,5 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { HttpClient, HttpEventType } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -16,7 +16,7 @@ import {
   DFileUploadModule,
   DFileUploadProgress,
 } from '@duycaotu/d-mat-kit';
-import { map, of } from 'rxjs';
+import { map, of, pairwise, startWith } from 'rxjs';
 
 @Component({
   selector: 'component-viewer',
@@ -115,26 +115,30 @@ export class ComponentViewer {
       timeout: 1000,
     });
 
-    setTimeout(
-      () =>
-        this._progress.track({
-          name: 'hehe',
-          type: 'application/pdf',
-          progress$: of({
-            type: HttpEventType.UploadProgress,
-            loaded: 50,
-            total: 100,
-          }),
-        }),
-      1000
+    Array.from({ length: 100 }).map((_, index) =>
+      this._progress.track({
+        name: 'hehe' + index,
+        type: 'application/pdf',
+        progress$: of({
+          type: HttpEventType.Response,
+          // loaded: Math.round(Math.random() * 100),
+          // total: 100,
+        } as HttpEvent<any>),
+      })
     );
 
     const http = inject(HttpClient);
 
-    this.formControl.valueChanges.subscribe((files: File[] | null) => {
+    const uploadedFiles = new WeakSet<File>();
+
+    this.formControl.valueChanges.subscribe((files) => {
       console.log(files);
 
       for (let file of files || []) {
+        if (uploadedFiles.has(file)) continue;
+
+        uploadedFiles.add(file);
+
         const formData = new FormData();
         formData.append('file', file);
 

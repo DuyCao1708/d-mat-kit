@@ -1,15 +1,8 @@
-import {
-  afterNextRender,
-  ChangeDetectorRef,
-  Component,
-  inject,
-  Injector,
-  NgZone,
-} from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { catchError, delay, map, mergeMap, Observable, of, scan, Subject } from 'rxjs';
+import { catchError, map, mergeMap, of, scan } from 'rxjs';
 import { DSvgIconModule } from '../../modules/svg-icon';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FILE_UPLOAD_PROGRESS_DATA } from '../../tokens/config';
@@ -17,9 +10,10 @@ import { HttpEvent, HttpEventType } from '@angular/common/http';
 import { _animationsDisabled } from '@angular/material/core';
 import { OverlayRef } from '@angular/cdk/overlay';
 
-type FileUploadStatus = 'uploading' | 'completed' | 'error';
+type FileUploadStatus = 'uploading' | 'completed' | 'error' | 'cancelled';
 
 type FileProgress = {
+  id: number;
   name: string;
   type: string;
   progress: number;
@@ -27,15 +21,109 @@ type FileProgress = {
 };
 
 @Component({
+  selector: 'd-file-upload-progress-item',
+  imports: [MatIcon, DSvgIconModule, MatProgressSpinner],
+  template: `
+    <mat-icon
+      [svgIcon]="fileProgress().type"
+      class="d-file-upload-progress-item-icon"
+    ></mat-icon>
+
+    <p class="d-file-upload-progress-item-name">{{ fileProgress().name }}</p>
+
+    <div>
+      <!--prettier-ignore-->
+      @switch(fileProgress().status) { 
+            @case ('uploading') {
+      <mat-progress-spinner
+        mode="determinate"
+        [value]="fileProgress().progress"
+        diameter="20"
+      ></mat-progress-spinner>
+      } @case ('completed') {
+      <mat-icon class="d-file-upload-progress-item-success-status">
+        check_circle
+      </mat-icon>
+      } @case ('error') {
+      <mat-icon class="d-file-upload-progress-item-error-status">
+        error
+      </mat-icon>
+      } @case ('cancelled') { Upload cancled } }
+    </div>
+  `,
+  styles: [
+    `
+      :host {
+        cursor: pointer;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        padding: 0 16px;
+        height: 44px;
+
+        &:hover {
+          background-color: var(
+            --d-file-upload-progress-item-hover-state-color
+          );
+        }
+
+        &.d-file-upload-progress-item-uploading
+          .d-file-upload-progress-item-icon {
+          opacity: 0.2;
+        }
+      }
+
+      .d-file-upload-progress-item-icon {
+        width: 16px;
+        height: 16px;
+        min-width: 16px;
+      }
+
+      .d-file-upload-progress-item-name {
+        flex: 1;
+        color: var(--d-file-upload-progress-item-name-color);
+        overflow: hidden;
+        display: -webkit-box;
+        word-break: break-all;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+      }
+
+      .d-file-upload-progress-item-success-status {
+        color: var(--d-file-upload-progress-item-success-color);
+      }
+
+      .d-file-upload-progress-item-error-status {
+        color: var(--d-file-upload-progress-item-error-color);
+      }
+    `,
+  ],
+  host: {
+    '[class.d-file-upload-progress-item-uploading]': 'isUploading()',
+  },
+})
+export class DFileUploadProgressItem {
+  fileProgress = input.required<FileProgress>();
+
+  isUploading = computed(() => this.fileProgress().status === 'uploading');
+}
+
+const ENTER_ANIMATION = 'd-file-upload-progress-animation-enter';
+
+@Component({
   selector: 'd-file-upload-progress-container',
-  imports: [MatIconButton, MatIconModule, DSvgIconModule, MatProgressSpinner],
+  imports: [MatIconButton, MatIconModule, DFileUploadProgressItem],
   template: `
     <section class="d-file-upload-progress-header">
-      <h3>Upload complete</h3>
+      <h3>{{ title() }}</h3>
 
       <div>
-        <button matIconButton>
-          <mat-icon>keyboard_arrow_down</mat-icon>
+        <button matIconButton (click)="isCollapsed.set(!isCollapsed())">
+          <mat-icon
+            style="transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1)"
+            [style.transform]="isCollapsed() ? 'rotate(180deg)' : 'rotate(0)'"
+            >keyboard_arrow_down</mat-icon
+          >
         </button>
 
         <button matIconButton (click)="exit()">
@@ -44,41 +132,15 @@ type FileProgress = {
       </div>
     </section>
 
-    <section class="d-file-upload-progress-content">
+    <section
+      class="d-file-upload-progress-content"
+      [class.d-file-upload-progress-content-collapsed]="isCollapsed()"
+    >
       <!--prettier-ignore-->
-      @for (file of files(); track file.name) { 
-      @let isCompleted = file.status === 'completed';
-      @let isUploading = file.status === 'uploading';
-
-      <div
-        class="d-file-upload-progress-item"
-        [class.d-file-upload-progress-item-uploading]="isUploading"
-      >
-        <mat-icon
-          [svgIcon]="file.type"
-          class="d-file-upload-progress-item-icon"
-        ></mat-icon>
-
-        <p class="d-file-upload-progress-item-name">{{ file.name }}</p>
-
-        <div>
-          @if (isCompleted) {
-          <mat-icon class="d-file-upload-progress-item-success-status">
-            check_circle
-          </mat-icon>
-          } @else if (isUploading) {
-          <mat-progress-spinner
-            mode="determinate"
-            [value]="file.progress"
-            diameter="20"
-          >
-          </mat-progress-spinner>
-          } @else {
-          <mat-icon class="d-file-upload-progress-item-error-status">
-            error </mat-icon
-          >}
-        </div>
-      </div>
+      @for (file of files(); track file.id) {
+      <d-file-upload-progress-item
+        [fileProgress]="file"
+      ></d-file-upload-progress-item>
       }
     </section>
   `,
@@ -89,20 +151,6 @@ type FileProgress = {
         border-top-right-radius: var(--d-file-upload-progress-container-shape);
         box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3),
           0 1px 3px 1px rgba(60, 64, 67, 0.15);
-      }
-
-      .d-file-upload-progress-container-animations-enabled {
-        opacity: 0;
-
-        &.d-file-upload-progress-container-enter {
-          animation: _d-file-upload-progress-container-enter 150ms
-            cubic-bezier(0, 0, 0.2, 1) forwards;
-        }
-
-        &.d-file-upload-progress-container-exit {
-          animation: _d-file-upload-progress-container-exit 75ms
-            cubic-bezier(0.4, 0, 1, 1) forwards;
-        }
       }
 
       .d-file-upload-progress-header {
@@ -123,62 +171,22 @@ type FileProgress = {
       }
 
       .d-file-upload-progress-content {
+        transition: max-height 225ms cubic-bezier(0.4, 0, 0.2, 1);
         background-color: var(
           --d-file-upload-progress-content-background-color
         );
         width: var(--d-file-upload-progress-container-width);
         max-height: var(--d-file-upload-progress-container-max-height);
         overflow: auto;
-      }
 
-      .d-file-upload-progress-item {
-        cursor: pointer;
-        display: flex;
-        gap: 16px;
-        align-items: center;
-        padding: 0 16px;
-        min-height: 44px;
-
-        &:hover {
-          background-color: var(
-            --d-file-upload-progress-item-hover-state-color
-          );
+        &.d-file-upload-progress-content-collapsed {
+          max-height: 0;
         }
-
-        .d-file-upload-progress-item-icon {
-          width: 16px;
-          height: 16px;
-          min-width: 16px;
-        }
-
-        .d-file-upload-progress-item-name {
-          flex: 1;
-          color: var(--d-file-upload-progress-item-name-color);
-          overflow: hidden;
-          display: -webkit-box;
-          word-break: break-all;
-          -webkit-box-orient: vertical;
-          -webkit-line-clamp: 1;
-        }
-
-        .d-file-upload-progress-item-success-status {
-          color: var(--d-file-upload-progress-item-success-color);
-        }
-
-        .d-file-upload-progress-item-error-status {
-          color: var(--d-file-upload-progress-item-error-color);
-        }
-      }
-
-      .d-file-upload-progress-item.d-file-upload-progress-item-uploading
-        .d-file-upload-progress-item-icon {
-        opacity: 0.2;
       }
     `,
   ],
   host: {
-    'animate.enter': 'd-file-upload-progress-animation-enter',
-    'animate.leave': 'd-file-upload-progress-animation-leave',
+    'animate.enter': ENTER_ANIMATION,
   },
 })
 export class DFileUploadProgressContainer {
@@ -186,34 +194,58 @@ export class DFileUploadProgressContainer {
 
   readonly files = toSignal(
     inject(FILE_UPLOAD_PROGRESS_DATA).pipe(
-      mergeMap(({ name, type, progress$ }) =>
-        progress$.pipe(
-          map((event) => this.mapHttpEventToFileProgress(name, type, event)),
+      mergeMap(({ name, type, progress$ }, index) => {
+        const id = new Date().getTime() + index;
+
+        return progress$.pipe(
+          map((event) =>
+            this.mapHttpEventToFileProgress(id, name, type, event)
+          ),
           catchError(() =>
             of({
+              id,
               name,
               type,
               progress: 0,
               status: 'error',
             } as FileProgress)
           )
-        )
-      ),
+        );
+      }),
       scan((acc: FileProgress[], curr: FileProgress) => {
         const index = acc.findIndex((file) => file.name === curr.name);
         if (index > -1) acc[index] = { ...acc[index], ...curr };
         else acc.unshift(curr);
-        return acc;
+        return [...acc];
       }, [])
     ),
     { initialValue: [] }
   );
+
+  readonly title = computed(() => {
+    const files = this.files();
+    const uploading = files.filter((file) => file.status === 'uploading');
+
+    if (uploading.length)
+      return `Uploading ${uploading.length} item${
+        uploading.length > 1 ? 's' : ''
+      }`;
+    else {
+      const completed = files.filter((file) => file.status === 'completed');
+      return `${completed.length} upload${
+        completed.length > 1 ? 's' : ''
+      } complete`;
+    }
+  });
+
+  isCollapsed = signal(false);
 
   exit() {
     this._overlayRef.dispose();
   }
 
   private mapHttpEventToFileProgress(
+    id: number,
     name: string,
     type: string,
     event: HttpEvent<any>
@@ -223,12 +255,12 @@ export class DFileUploadProgressContainer {
         const progress = event.total
           ? Math.round((event.loaded / event.total) * 100)
           : 0;
-        return { name, type, status: 'uploading', progress };
+        return { id, name, type, status: 'uploading', progress };
       }
       case HttpEventType.Response:
-        return { name, type, status: 'completed', progress: 100 };
+        return { id, name, type, status: 'completed', progress: 100 };
       default:
-        return { name, type, status: 'uploading', progress: 0 };
+        return { id, name, type, status: 'uploading', progress: 0 };
     }
   }
 }

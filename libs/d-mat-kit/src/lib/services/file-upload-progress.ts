@@ -9,6 +9,7 @@ import { DFileUploadProgressContainer } from '../components/file-upload/file-upl
 import {
   DFileProgress,
   DFileUploadProgressConfig,
+  DFileUploadProgressContainerRef,
 } from '../models/file-upload';
 import {
   FILE_UPLOAD_PROGRESS_DATA,
@@ -22,23 +23,35 @@ export class DFileUploadProgress {
   private _defaultConfig = inject(FILE_UPLOAD_PROGRESS_OPTIONS);
   private _injector = inject(Injector);
 
-  private _openedUploadProgressContainer: DFileUploadProgressContainer | null =
+  private _openedUploadProgressContainerRef: DFileUploadProgressContainerRef | null =
     null;
 
   private _fileProgress$ = new Subject<DFileProgress>();
 
   track(file: DFileProgress, config?: DFileUploadProgressConfig) {
-    if (!this._openedUploadProgressContainer) this.attach(config);
+    if (!this._openedUploadProgressContainerRef) this.attach(config);
 
     this._fileProgress$.next(file);
+
+    return this._openedUploadProgressContainerRef!;
   }
 
   private attach(userConfig?: DFileUploadProgressConfig) {
     const config = { ...this._defaultConfig, ...userConfig };
     const overlayRef = this.createOverlay(config);
-    const container = this.attachUploadProgressContainer(overlayRef, config);
+    this.attachUploadProgressContainer(overlayRef, config);
 
-    this._openedUploadProgressContainer = container;
+    const containerRef = new DFileUploadProgressContainerRef(overlayRef);
+
+    containerRef.afterDismissed().subscribe(() => {
+      this._openedUploadProgressContainerRef = null;
+      this._fileProgress$.complete();
+      this._fileProgress$ = new Subject<DFileProgress>();
+    });
+
+    this._openedUploadProgressContainerRef = containerRef;
+
+    return containerRef;
   }
 
   private createOverlay(config: DFileUploadProgressConfig): OverlayRef {
@@ -83,6 +96,10 @@ export class DFileUploadProgress {
           provide: FILE_UPLOAD_PROGRESS_DATA,
           useValue: this._fileProgress$.asObservable(),
         },
+        {
+          provide: OverlayRef,
+          useValue: overlayRef,
+        },
       ],
     });
 
@@ -94,5 +111,4 @@ export class DFileUploadProgress {
     const containerRef = overlayRef.attach(containerPortal);
     return containerRef.instance;
   }
-
 }
