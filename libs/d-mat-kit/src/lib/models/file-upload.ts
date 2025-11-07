@@ -72,8 +72,6 @@ export class DFileUploadProgressContainerRef {
 export type DFileUploadOptions = {
   /** Default option displayed in the upload options dialog */
   defaultUploadOption: DFileUploadOptionResult;
-  /** CSS class applied in the upload options dialog title */
-  uploadOptionsDialogTitleClass?: string;
   /** Whether to automatically ignore duplicate files or process them */
   ignoreDuplicate: boolean;
 };

@@ -20,9 +20,7 @@ import {
 } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
 import { FILE_UPLOAD_INTL } from '../../tokens/intl';
-import {
-  DFileUploadOptionResult,
-} from '../../models/file-upload';
+import { DFileUploadOptionResult } from '../../models/file-upload';
 import { FILE_UPLOAD_OPTIONS } from '../../tokens/config';
 import { MatButtonModule } from '@angular/material/button';
 import { Observable } from 'rxjs';
@@ -402,7 +400,9 @@ export class DFileUpload implements ControlValueAccessor {
     MarkdownComponent,
   ],
   template: `
-    <h2 mat-dialog-title [class]="titleClassList">{{ title }}</h2>
+    <h2 mat-dialog-title class="d-file-upload-option-dialog-title">
+      {{ title }}
+    </h2>
 
     <mat-dialog-content>
       <markdown>{{ message }}</markdown>
@@ -458,7 +458,6 @@ class DFileUploadOptionDialog {
   constructor() {
     const options = inject(FILE_UPLOAD_OPTIONS);
     this.selectedValue = options.defaultUploadOption;
-    this.titleClassList = options.uploadOptionsDialogTitleClass || '';
 
     const intl = inject(FILE_UPLOAD_INTL);
     this.title = intl.uploadOptionsDialogTitle;
