@@ -16,7 +16,7 @@ import {
   DFileUploadModule,
   DFileUploadProgress,
 } from '@duycaotu/d-mat-kit';
-import { map, of, pairwise, startWith } from 'rxjs';
+import { map, of, pairwise, startWith, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'component-viewer',
@@ -120,9 +120,9 @@ export class ComponentViewer {
         name: 'hehe' + index,
         type: 'application/pdf',
         progress$: of({
-          type: HttpEventType.Response,
-          // loaded: Math.round(Math.random() * 100),
-          // total: 100,
+          type: HttpEventType.UploadProgress,
+          loaded: Math.round(Math.random() * 100),
+          total: 100,
         } as HttpEvent<any>),
       })
     );

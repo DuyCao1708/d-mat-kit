@@ -1,4 +1,11 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -10,7 +17,7 @@ import { HttpEvent, HttpEventType } from '@angular/common/http';
 import { _animationsDisabled } from '@angular/material/core';
 import { OverlayRef } from '@angular/cdk/overlay';
 
-type FileUploadStatus = 'uploading' | 'completed' | 'error' | 'cancelled';
+type FileUploadStatus = 'uploading' | 'completed' | 'error';
 
 type FileProgress = {
   id: number;
@@ -22,7 +29,7 @@ type FileProgress = {
 
 @Component({
   selector: 'd-file-upload-progress-item',
-  imports: [MatIcon, DSvgIconModule, MatProgressSpinner],
+  imports: [MatIcon, DSvgIconModule, MatProgressSpinner, MatIconButton],
   template: `
     <mat-icon
       [svgIcon]="fileProgress().type"
@@ -34,21 +41,32 @@ type FileProgress = {
     <div>
       <!--prettier-ignore-->
       @switch(fileProgress().status) { 
-            @case ('uploading') {
-      <mat-progress-spinner
-        mode="determinate"
-        [value]="fileProgress().progress"
-        diameter="20"
-      ></mat-progress-spinner>
-      } @case ('completed') {
-      <mat-icon class="d-file-upload-progress-item-success-status">
-        check_circle
-      </mat-icon>
-      } @case ('error') {
-      <mat-icon class="d-file-upload-progress-item-error-status">
-        error
-      </mat-icon>
-      } @case ('cancelled') { Upload cancled } }
+      @case ('uploading') {
+      <!--prettier-ignore-->
+      <div style="margin: 0 8px">
+        <mat-progress-spinner
+          mode="determinate"
+          [value]="fileProgress().progress"
+          diameter="20"
+        ></mat-progress-spinner>
+      </div>
+      }
+      <!--prettier-ignore-->
+      @case ('completed') {
+      <button matIconButton>
+        <mat-icon class="d-file-upload-progress-item-success-status">
+          check_circle
+        </mat-icon>
+      </button>
+      }
+      <!--prettier-ignore-->
+      @case ('error') {
+      <button matIconButton>
+        <mat-icon class="d-file-upload-progress-item-error-status">
+          error
+        </mat-icon>
+      </button>
+      } }
     </div>
   `,
   styles: [
@@ -59,9 +77,8 @@ type FileProgress = {
         gap: 16px;
         align-items: center;
         padding: 0 16px;
-        height: 44px;
 
-        &:hover {
+        &:not(.d-file-upload-progress-item-uploading):hover {
           background-color: var(
             --d-file-upload-progress-item-hover-state-color
           );
