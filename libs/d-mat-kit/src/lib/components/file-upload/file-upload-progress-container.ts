@@ -3,7 +3,6 @@ import {
   computed,
   inject,
   input,
-  output,
   signal,
 } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
