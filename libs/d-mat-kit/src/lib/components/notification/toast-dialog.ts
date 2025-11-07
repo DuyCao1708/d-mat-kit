@@ -20,7 +20,6 @@ import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
       [threshold]="100"
       (swiped)="close.emit(options.id)"
       [options]="options"
-      [class]="options.toastClass"
       (close)="close.emit(options.id)"
     ></d-toast>
     }

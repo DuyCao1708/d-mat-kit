@@ -32,7 +32,7 @@ import { NOTIFICATION_OPTIONS } from '../../tokens/config';
     NgTemplateOutlet,
   ],
   template: `
-    <h2 mat-dialog-title class="d-notification-title" [class]="titleClassList">
+    <h2 mat-dialog-title class="d-notification-title" [class]="titleClass">
       {{ title }}
     </h2>
 
@@ -541,11 +541,8 @@ export class DNotificationDialog {
 
   /** Title text to display in the notification dialog */
   readonly title: string;
-  /**
-   * CSS class list for styling the title based on the type of notification.
-   * Includes custom class (if provided) and default type class.
-   */
-  readonly titleClassList: string;
+  /** CSS class list for styling the title based on the type of notification. */
+  readonly titleClass: string;
   /** Type of the notification: determines icon and styling (success, error, warn) */
   readonly type: DNotificationType;
   /** Markdown-supported message content to be shown in the notification body */
@@ -582,10 +579,7 @@ export class DNotificationDialog {
     const defaultOptions = inject(NOTIFICATION_OPTIONS);
 
     this.title = options.title || this.getDefaultTitle(options);
-    this.titleClassList = [
-      options.titleClass || '',
-      `d-notification-title-${options.type}`,
-    ].join(' ');
+    this.titleClass = `d-notification-title-${options.type}`;
 
     this.type = options.type as DNotificationType;
     this.message = options.message;

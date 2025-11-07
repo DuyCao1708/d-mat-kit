@@ -23,8 +23,6 @@ export type DNotificationOptions = {
   message: string;
   /** Custom title displayed in the dialog header. */
   title?: string;
-  /** Custom class applied to the dialog title header. */
-  titleClass?: string;
   /** Action configuration for displaying an action button or custom template. */
   action?: {
     /** The text label for the action button. */
@@ -53,8 +51,6 @@ export type DToastOptions = {
   type: DNotificationType | 'error' | 'success' | 'warn';
   /** The main message displayed the toast. */
   message: string;
-  /** Custom class to apply to the toast container. */
-  toastClass?: string;
   /**
    * Duration (in seconds) before the toast automatically disappears.
    * If not provided, the default value from global config will be used.
