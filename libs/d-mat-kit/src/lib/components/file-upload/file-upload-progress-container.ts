@@ -1,10 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  input,
-  signal,
-} from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -27,6 +21,7 @@ type FileProgress = {
   status: FileUploadStatus;
 };
 
+/** Represents the progress of a single file upload. */
 @Component({
   selector: 'd-file-upload-progress-item',
   imports: [MatIcon, DSvgIconModule, MatProgressSpinner, MatIconButton],
@@ -120,13 +115,16 @@ type FileProgress = {
   },
 })
 export class DFileUploadProgressItem {
+  /** The progress information of the file to be displayed. */
   fileProgress = input.required<FileProgress>();
 
+  /** Returns true if the file is currently uploading. */
   isUploading = computed(() => this.fileProgress().status === 'uploading');
 }
 
 const ENTER_ANIMATION = 'd-file-upload-progress-animation-enter';
 
+/** Represents a container for displaying multiple file upload progress items. */
 @Component({
   selector: 'd-file-upload-progress-container',
   imports: [MatIconButton, MatIconModule, DFileUploadProgressItem],
@@ -210,6 +208,12 @@ export class DFileUploadProgressContainer {
   private _overlayRef = inject(OverlayRef);
   private _intl = inject(FILE_UPLOAD_INTL);
 
+   /**
+   * Signal that holds the list of file progress items.
+   *
+   * Derived from `FILE_UPLOAD_PROGRESS_DATA`, merges individual file progress streams,
+   * maps HttpEvents to `FileProgress`, and accumulates the progress of all files.
+   */
   readonly files = toSignal(
     inject(FILE_UPLOAD_PROGRESS_DATA).pipe(
       mergeMap(({ name, type, progress$ }, index) => {
@@ -240,6 +244,7 @@ export class DFileUploadProgressContainer {
     { initialValue: [] }
   );
 
+  /** Computed title of container. */
   readonly title = computed(() => {
     const files = this.files();
     const uploading = files.filter(
@@ -252,8 +257,10 @@ export class DFileUploadProgressContainer {
     return this._intl.uploadProgressContainerTitle(uploading, completed);
   });
 
+  /** Signal controlling whether the progress list is collapsed. */
   isCollapsed = signal(false);
 
+  /** Closes the progress overlay. */
   exit() {
     this._overlayRef.dispose();
   }

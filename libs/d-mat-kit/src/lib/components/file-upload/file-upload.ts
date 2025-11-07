@@ -387,6 +387,7 @@ export class DFileUpload implements ControlValueAccessor {
   }
 }
 
+/** Dialog component for selecting file upload options when conflicts occur. */
 @Component({
   selector: 'd-file-upload-option-dialog',
   imports: [
