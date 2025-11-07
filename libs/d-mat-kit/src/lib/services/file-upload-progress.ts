@@ -72,12 +72,9 @@ export class DFileUploadProgress {
     } else {
       positionStrategy.centerHorizontally();
     }
+    
     // Set vertical position.
-    if (config.verticalPosition === 'top') {
-      positionStrategy.top('0');
-    } else {
-      positionStrategy.bottom('0');
-    }
+    positionStrategy.bottom('0');
 
     overlayConfig.positionStrategy = positionStrategy;
     return createOverlayRef(this._injector, overlayConfig);

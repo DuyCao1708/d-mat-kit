@@ -167,7 +167,6 @@ const DEFAULT_FILE_UPLOAD_OPTIONS: DFileUploadOptions = {
 /** Default file upload progress configuration */
 const DEFAULT_FILE_UPLOAD_PROGRESS_OPTIONS: DFileUploadProgressConfig = {
   horizontalPosition: 'right',
-  verticalPosition: 'bottom',
   sideMargin: '24px',
 };
 
@@ -185,6 +184,13 @@ const DEFAULT_FILE_UPLOAD_INTL: DFileUploadIntl = {
         : `${files[0].name} already uploaded. `) +
       'Do you want to replace the existing items with a new version or keep both items?'
     );
+  },
+  uploadProgressContainerTitle: (uploading: number, completed: number) => {
+    if (uploading)
+      return `Uploading ${uploading} item${uploading > 1 ? 's' : ''}`;
+    else {
+      return `${completed} upload${completed > 1 ? 's' : ''} complete`;
+    }
   },
 };
 

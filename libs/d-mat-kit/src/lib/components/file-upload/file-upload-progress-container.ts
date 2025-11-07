@@ -16,6 +16,7 @@ import { FILE_UPLOAD_PROGRESS_DATA } from '../../tokens/config';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
 import { _animationsDisabled } from '@angular/material/core';
 import { OverlayRef } from '@angular/cdk/overlay';
+import { FILE_UPLOAD_INTL } from '../../tokens/intl';
 
 type FileUploadStatus = 'uploading' | 'completed' | 'error';
 
@@ -208,6 +209,7 @@ const ENTER_ANIMATION = 'd-file-upload-progress-animation-enter';
 })
 export class DFileUploadProgressContainer {
   private _overlayRef = inject(OverlayRef);
+  private _intl = inject(FILE_UPLOAD_INTL);
 
   readonly files = toSignal(
     inject(FILE_UPLOAD_PROGRESS_DATA).pipe(
@@ -241,18 +243,14 @@ export class DFileUploadProgressContainer {
 
   readonly title = computed(() => {
     const files = this.files();
-    const uploading = files.filter((file) => file.status === 'uploading');
+    const uploading = files.filter(
+      (file) => file.status === 'uploading'
+    ).length;
+    const completed = files.filter(
+      (file) => file.status === 'completed'
+    ).length;
 
-    if (uploading.length)
-      return `Uploading ${uploading.length} item${
-        uploading.length > 1 ? 's' : ''
-      }`;
-    else {
-      const completed = files.filter((file) => file.status === 'completed');
-      return `${completed.length} upload${
-        completed.length > 1 ? 's' : ''
-      } complete`;
-    }
+    return this._intl.uploadProgressContainerTitle(uploading, completed);
   });
 
   isCollapsed = signal(false);

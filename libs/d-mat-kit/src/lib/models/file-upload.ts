@@ -15,9 +15,6 @@ export type DFileUploadProgressHorizontalPosition =
   | 'left'
   | 'right';
 
-/** Possible values for verticalPosition on DFileUploadProgressConfig. */
-export type DFileUploadProgressVerticalPosition = 'top' | 'bottom';
-
 /** Configure file upload progress display. */
 export type DFileUploadProgressConfig = {
   /**
@@ -29,8 +26,6 @@ export type DFileUploadProgressConfig = {
   direction?: Direction;
   /** The horizontal position to place the upload progress container. */
   horizontalPosition?: DFileUploadProgressHorizontalPosition;
-  /** The vertical position to place the upload progress container. */
-  verticalPosition?: DFileUploadProgressVerticalPosition;
   /** The horizontal offset of the overlay from the left or right edge of the viewport */
   sideMargin?: string;
 };
@@ -50,9 +45,7 @@ export class DFileUploadProgressContainerRef {
   /** Subject for notifying the user that the snack bar has been dismissed. */
   private readonly _afterDismissed = new Subject<void>();
 
-  constructor(
-    private _overlayRef: OverlayRef
-  ) {
+  constructor(private _overlayRef: OverlayRef) {
     this._overlayRef.detachments().subscribe(() => this._finishDismiss());
   }
 
@@ -101,4 +94,9 @@ export type DFileUploadIntl = {
   buttonUploadLabel: string;
   /** Message displays in the upload options dialog. Markdown supported */
   uploadOptionsDialogContentMessage: (files: File[]) => string;
+  /** File upload progress container title. */
+  uploadProgressContainerTitle: (
+    uploading: number,
+    completed: number
+  ) => string;
 };
