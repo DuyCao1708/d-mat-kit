@@ -21,7 +21,7 @@ export type DNotificationOptions = {
   type: DNotificationType | 'error' | 'success' | 'warn';
   /** The main message content of the notification. */
   message: string;
-  /** Custome title displayed in the dialog header. */
+  /** Custom title displayed in the dialog header. */
   title?: string;
   /** Custom class applied to the dialog title header. */
   titleClass?: string;

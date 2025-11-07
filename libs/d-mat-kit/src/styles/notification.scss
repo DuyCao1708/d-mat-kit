@@ -30,7 +30,7 @@
   }
 }
 
-@keyframes dToastSlideInLeft {
+@keyframes _d-toast-enter {
   from {
     opacity: 0;
     transform: translateX(calc(100% + 16px)) scale(0);
@@ -41,7 +41,7 @@
   }
 }
 
-@keyframes dToastFadeOut {
+@keyframes _d-toast-exit {
   to {
     opacity: 0;
     transform: translateY(-100%);

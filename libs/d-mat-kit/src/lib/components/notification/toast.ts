@@ -91,7 +91,7 @@ export class DToast {
    * Fade-out timing depends on `options.timeout`.
    */
   protected get getAnimation() {
-    return `dToastSlideInLeft ease 0.3s, dToastFadeOut linear 1s ${
+    return `_d-toast-enter ease 0.3s, _d-toast-exit linear 1s ${
       this.options().timeout
     }s forwards`;
   }

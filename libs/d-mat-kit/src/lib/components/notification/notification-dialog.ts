@@ -538,7 +538,6 @@ import { NOTIFICATION_OPTIONS } from '../../tokens/config';
 })
 export class DNotificationDialog {
   private readonly _intl = inject(NOTIFICATION_INTL);
-  private readonly _defaultOptions = inject(NOTIFICATION_OPTIONS);
 
   /** Title text to display in the notification dialog */
   readonly title: string;
@@ -580,6 +579,7 @@ export class DNotificationDialog {
 
   constructor() {
     const options = inject(MAT_DIALOG_DATA) as DNotificationOptions;
+    const defaultOptions = inject(NOTIFICATION_OPTIONS);
 
     this.title = options.title || this.getDefaultTitle(options);
     this.titleClassList = [
@@ -592,7 +592,7 @@ export class DNotificationDialog {
     this.buttonCloseLabel = this._intl.buttonCloseLabel;
     this.buttonActionLabel =
       options.action?.label || this._intl.buttonActionLabel;
-    this.showClose = options.showClose ?? this._defaultOptions.showClose;
+    this.showClose = options.showClose ?? defaultOptions.showClose;
     this.actionOptions = options.action;
     this.closeCallback = options.onCloseClick;
   }

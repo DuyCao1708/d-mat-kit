@@ -6,12 +6,23 @@ import {
   DTableOptions,
   PartialDTableOptions,
 } from '../models';
-import { NOTIFICATION_OPTIONS, TABLE_OPTIONS } from './config';
-import { NOTIFICATION_INTL, TABLE_INTL } from './intl';
+import {
+  FILE_UPLOAD_OPTIONS,
+  FILE_UPLOAD_PROGRESS_OPTIONS,
+  NOTIFICATION_OPTIONS,
+  TABLE_OPTIONS,
+} from './config';
+import { FILE_UPLOAD_INTL, NOTIFICATION_INTL, TABLE_INTL } from './intl';
+import {
+  DFileUploadIntl,
+  DFileUploadOptions,
+  DFileUploadProgressConfig,
+} from '../models/file-upload';
 
 enum DMatKitFeatureKind {
   Notification = 0,
   Table = 1,
+  FileUpload = 2,
 }
 
 interface DMatKitFeature<KindT extends DMatKitFeatureKind> {
@@ -47,8 +58,8 @@ const DEFAULT_NOTIFICATION_INTL: DNotificationIntl = {
 /** Configures the notification feature with options and internationalization. */
 export const withNotification = (
   config?: Partial<{
-    options?: Partial<DNofiticationGlobalOptions>;
-    intl?: Partial<DNotificationIntl>;
+    options: Partial<DNofiticationGlobalOptions>;
+    intl: Partial<DNotificationIntl>;
   }>
 ): DMatKitFeature<DMatKitFeatureKind> => {
   const providers = [];
@@ -141,6 +152,75 @@ export const withTable = (
 
   return {
     kind: DMatKitFeatureKind.Table,
+    providers: providers,
+  };
+};
+//#endregion
+
+//#region File Upload
+/** Default file upload configuration */
+const DEFAULT_FILE_UPLOAD_OPTIONS: DFileUploadOptions = {
+  defaultUploadOption: 'replace',
+  ignoreDuplicate: false,
+};
+
+/** Default file upload progress configuration */
+const DEFAULT_FILE_UPLOAD_PROGRESS_OPTIONS: DFileUploadProgressConfig = {
+  horizontalPosition: 'right',
+  sideMargin: '24px',
+};
+
+/** Default file upload internationalization */
+const DEFAULT_FILE_UPLOAD_INTL: DFileUploadIntl = {
+  uploadOptionsDialogTitle: 'Upload options',
+  replaceOptionLabel: 'Replace existing file',
+  keepOptionLabel: 'Keep both files',
+  buttonCancelLabel: 'Cancel',
+  buttonUploadLabel: 'Upload',
+  uploadOptionsDialogContentMessage: (files: File[]) => {
+    return (
+      (files.length > 1
+        ? 'One or more items already uploaded. '
+        : `${files[0].name} already uploaded. `) +
+      'Do you want to replace the existing items with a new version or keep both items?'
+    );
+  },
+  uploadProgressContainerTitle: (uploading: number, completed: number) => {
+    if (uploading)
+      return `Uploading ${uploading} item${uploading > 1 ? 's' : ''}`;
+    else {
+      return `${completed} upload${completed > 1 ? 's' : ''} complete`;
+    }
+  },
+};
+
+/** Configures the file upload feature with options and internationalization. */
+export const withFileUpload = (
+  config?: Partial<{
+    options: Partial<DFileUploadOptions>;
+    progress: Partial<DFileUploadProgressConfig>;
+    intl: Partial<DFileUploadIntl>;
+  }>
+): DMatKitFeature<DMatKitFeatureKind> => {
+  const providers = [];
+
+  providers.push({
+    provide: FILE_UPLOAD_OPTIONS,
+    useValue: { ...DEFAULT_FILE_UPLOAD_OPTIONS, ...config?.options },
+  });
+
+  providers.push({
+    provide: FILE_UPLOAD_PROGRESS_OPTIONS,
+    useValue: { ...DEFAULT_FILE_UPLOAD_PROGRESS_OPTIONS, ...config?.progress },
+  });
+
+  providers.push({
+    provide: FILE_UPLOAD_INTL,
+    useValue: { ...DEFAULT_FILE_UPLOAD_INTL, ...config?.intl },
+  });
+
+  return {
+    kind: DMatKitFeatureKind.FileUpload,
     providers: providers,
   };
 };
