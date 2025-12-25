@@ -1,0 +1,25 @@
+:root {
+  --d-table-row-hover-state-color: var(--mat-sys-surface-container);
+  --d-table-row-focus-state-color: var(--mat-sys-surface-container-high);
+  --d-table-row-expanded-row-color: var(--mat-sys-surface);
+  --d-table-row-even-row-color: var(--mat-sys-surface);
+  --d-table-row-odd-row-color: var(--mat-sys-surface-container-low);
+}
+
+.d-table-header-sortable-header-justify-start {
+  .mat-sort-header-container {
+    text-align: start;
+  }
+}
+
+.d-table-header-sortable-header-justify-center {
+  .mat-sort-header-container {
+    text-align: center;
+  }
+}
+
+.d-table-header-sortable-header-justify-end {
+  .mat-sort-header-container {
+    text-align: end;
+  }
+}

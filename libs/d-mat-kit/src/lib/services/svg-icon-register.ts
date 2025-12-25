@@ -1,0 +1,570 @@
+import { inject, Injectable } from '@angular/core';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
+
+// prettier-ignore
+const SVG_ICONS = {
+  "application/hta": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#3F51B5\"/>\n<path d=\"M399 151.157C416.673 151.157 431 165.484 431 183.157V363.157C431 380.83 416.673 395.157 399 395.157H113C95.327 395.157 81.0001 380.83 81 363.157V149.73C81 132.057 95.3269 117.73 113 117.73H225.262L257.398 151.157H399Z\" fill=\"#03A9F4\"/>\n<path d=\"M202.622 361.661L163.004 361.81L162.879 361.685L163.027 322.063L278.908 206.185L318.504 245.781L202.622 361.661Z\" fill=\"white\"/>\n<path d=\"M311.335 173.342C313.678 170.999 317.477 170.999 319.82 173.342L350.933 204.455C353.276 206.798 353.276 210.597 350.933 212.94L329.719 234.153L290.121 194.555L311.335 173.342Z\" fill=\"white\"/>\n</svg>\n",
+  "application/msaccess": "<svg width=\"418\" height=\"512\" viewBox=\"0 0 418 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M246.008 0.000671387L418 171.993V448.001C418 483.347 389.346 512.001 354 512.001H64C28.6539 512.001 0.000197916 483.347 0 448.001V64.0007C0 28.6544 28.6538 0.000671387 64 0.000671387H246.008Z\" fill=\"#C04075\"/>\n<path d=\"M418 172H310C274.654 172 246 143.346 246 108V0L418 172Z\" fill=\"#E7B3C8\"/>\n<path d=\"M61.2031 370.946C61.2031 367.852 62.2344 365.274 64.2969 363.211C66.3594 361.102 69.1484 360.047 72.6641 360.047C76.1797 360.047 78.9688 361.102 81.0312 363.211C83.0938 365.274 84.125 367.852 84.125 370.946C84.125 374.039 83.0938 376.618 81.0312 378.68C78.9688 380.743 76.1797 381.774 72.6641 381.774C69.1484 381.774 66.3594 380.743 64.2969 378.68C62.2344 376.618 61.2031 374.039 61.2031 370.946ZM109.789 278.625H127.859L148.742 348.657L169.555 278.625H185.516L156.406 381H141.008L109.789 278.625ZM102.477 278.625H119.703L122.375 346.125V381H102.477V278.625ZM177.641 278.625H194.938V381H175.109V346.125L177.641 278.625ZM238.461 381H220.391L220.531 363.985H238.461C243.43 363.985 247.297 363.094 250.062 361.313C252.828 359.532 254.773 356.719 255.898 352.875C257.07 349.032 257.656 343.993 257.656 337.758V321.797C257.656 317.063 257.352 313.055 256.742 309.774C256.133 306.446 255.102 303.774 253.648 301.758C252.195 299.696 250.25 298.172 247.812 297.188C245.375 296.203 242.352 295.711 238.742 295.711H220.039V278.625H238.742C244.648 278.625 250.016 279.586 254.844 281.508C259.672 283.43 263.82 286.243 267.289 289.946C270.758 293.602 273.43 298.125 275.305 303.516C277.18 308.907 278.117 315.047 278.117 321.938V337.758C278.117 344.696 277.18 350.836 275.305 356.18C273.43 361.524 270.758 366.047 267.289 369.75C263.867 373.407 259.719 376.196 254.844 378.118C249.969 380.039 244.508 381 238.461 381ZM232.344 278.625V381H211.742V278.625H232.344ZM327.758 336.352H306.734L306.664 321.446H324.523C327.336 321.446 329.633 320.977 331.414 320.039C333.242 319.055 334.578 317.625 335.422 315.75C336.312 313.828 336.758 311.508 336.758 308.789C336.758 305.649 336.336 303.141 335.492 301.266C334.695 299.344 333.406 297.938 331.625 297.047C329.891 296.157 327.594 295.711 324.734 295.711H313.766V381H293.164V278.625H324.734C329.797 278.625 334.344 279.188 338.375 280.313C342.406 281.438 345.828 283.172 348.641 285.516C351.453 287.813 353.609 290.719 355.109 294.235C356.609 297.703 357.359 301.828 357.359 306.61C357.359 310.828 356.516 314.719 354.828 318.282C353.141 321.844 350.492 324.774 346.883 327.071C343.273 329.321 338.609 330.563 332.891 330.797L327.758 336.352ZM326.984 381H300.898L309.125 363.985H326.984C329.75 363.985 331.953 363.399 333.594 362.227C335.234 361.055 336.43 359.485 337.18 357.516C337.977 355.5 338.375 353.203 338.375 350.625C338.375 347.719 338.023 345.188 337.32 343.032C336.664 340.875 335.562 339.235 334.016 338.11C332.469 336.938 330.383 336.352 327.758 336.352H310.039L310.18 321.446H331.695L336.547 327.352C342.031 327.164 346.414 328.219 349.695 330.516C352.977 332.766 355.32 335.719 356.727 339.375C358.18 342.985 358.906 346.828 358.906 350.907C358.906 357.469 357.664 363 355.18 367.5C352.742 371.953 349.156 375.328 344.422 377.625C339.688 379.875 333.875 381 326.984 381Z\" fill=\"white\"/>\n</svg>\n",
+  "application/octet-stream": "<svg width=\"418\" height=\"512\" viewBox=\"0 0 418 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M246.008 0L418 171.992V448C418 483.346 389.346 512 354 512H64C28.6539 512 0.000197916 483.346 0 448V64C0 28.6538 28.6538 0 64 0H246.008Z\" fill=\"#1A73E8\"/>\n<path d=\"M396.804 193.246H288.804C253.458 193.246 224.804 164.592 224.804 129.246V21.2458L396.804 193.246Z\" fill=\"white\"/>\n</svg>\n",
+  "application/pdf": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#E5252A\"/>\n<path d=\"M132.689 277.881H97.1855V248.93H132.689C137.693 248.93 141.744 247.818 144.842 245.594C147.939 243.37 150.203 240.312 151.633 236.42C153.062 232.449 153.777 228.001 153.777 223.076C153.777 218.072 153.062 213.386 151.633 209.018C150.203 204.649 147.939 201.154 144.842 198.533C141.744 195.833 137.693 194.482 132.689 194.482H108.504V339H73.5957V165.531H132.689C144.365 165.531 154.373 167.993 162.713 172.918C171.132 177.842 177.605 184.633 182.133 193.291C186.66 201.869 188.924 211.718 188.924 222.838C188.924 234.037 186.66 243.767 182.133 252.027C177.605 260.208 171.132 266.562 162.713 271.09C154.373 275.617 144.365 277.881 132.689 277.881ZM257.549 339H226.93L227.168 310.168H257.549C265.968 310.168 272.521 308.659 277.207 305.641C281.893 302.622 285.189 297.857 287.096 291.344C289.081 284.831 290.074 276.292 290.074 265.729V238.684C290.074 230.661 289.558 223.87 288.525 218.311C287.493 212.671 285.745 208.144 283.283 204.729C280.821 201.234 277.525 198.652 273.395 196.984C269.264 195.316 264.141 194.482 258.025 194.482H226.334V165.531H258.025C268.033 165.531 277.128 167.16 285.309 170.416C293.49 173.673 300.519 178.438 306.396 184.713C312.274 190.908 316.801 198.573 319.979 207.707C323.156 216.841 324.744 227.246 324.744 238.922V265.729C324.744 277.484 323.156 287.889 319.979 296.943C316.801 305.998 312.274 313.663 306.396 319.938C300.598 326.133 293.569 330.859 285.309 334.115C277.048 337.372 267.795 339 257.549 339ZM247.184 165.531V339H212.275V165.531H247.184ZM385.148 165.531V339H350.24V165.531H385.148ZM439.477 239.279V268.111H376.332V239.279H439.477ZM446.148 165.531V194.482H376.332V165.531H446.148Z\" fill=\"white\"/>\n</svg>\n",
+  "application/postscript": "<svg width=\"512\" height=\"494\" viewBox=\"0 0 512 494\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M64 64.7275H295.905V60C295.905 26.8629 322.768 0 355.905 0H452C485.137 0 512 26.8629 512 60V279.818C512 315.165 483.346 343.818 448 343.818H64C28.6538 343.818 0 315.165 0 279.818V128.728C0 93.3813 28.6538 64.7275 64 64.7275Z\" fill=\"#028D39\"/>\n<path d=\"M448 121.362C483.346 121.362 512 150.016 512 185.362V336.453C512 371.799 483.346 400.453 448 400.453H64C28.6538 400.453 0 371.799 0 336.453V116.635C0 83.4977 26.8629 56.6348 60 56.6348H156.095C189.232 56.6348 216.095 83.4977 216.095 116.635V121.362H448Z\" fill=\"#DB0000\"/>\n<path d=\"M64 181.675H295.905V176.947C295.905 143.81 322.768 116.947 355.905 116.947H452C485.137 116.947 512 143.81 512 176.947V396.766C512 432.112 483.346 460.766 448 460.766H64C28.6538 460.766 0 432.112 0 396.766V245.675C0 210.329 28.6538 181.675 64 181.675Z\" fill=\"#005DBE\"/>\n<path d=\"M448 235.334C483.346 235.334 512 263.988 512 299.334V429.129C512 464.475 483.346 493.129 448 493.129H64C28.6538 493.129 0 464.475 0 429.129V235.334H448ZM156.095 170.605C189.232 170.605 216.095 197.469 216.095 230.606V235.333L0 235.334V230.606C0 197.469 26.8629 170.605 60 170.605H156.095Z\" fill=\"#FCCD4A\"/>\n</svg>\n",
+  "application/rar": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#5F6368\"/>\n<path d=\"M368 305.038L256 432.211H255.996L144.002 305.025H368V305.038ZM368 269.003H144V207.074H368V269.003ZM368 171.052H144V114.126H368V171.052Z\" fill=\"white\"/>\n</svg>\n",
+  "application/rtf": "<svg width=\"418\" height=\"512\" viewBox=\"0 0 418 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M246.008 0L418 171.992V448C418 483.346 389.346 512 354 512H64C28.6539 512 0.000197916 483.346 0 448V64C0 28.6538 28.6538 0 64 0H246.008Z\" fill=\"#1A73E8\"/>\n<path d=\"M396.804 193.246H288.804C253.458 193.246 224.804 164.592 224.804 129.246V21.2458L396.804 193.246Z\" fill=\"white\"/>\n<rect x=\"103\" y=\"244\" width=\"212\" height=\"56\" fill=\"#FAFAFA\"/>\n<rect x=\"103\" y=\"344\" width=\"212\" height=\"56\" fill=\"#FAFAFA\"/>\n</svg>\n",
+  "application/vnd.google-apps.document": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#4285F4\"/>\n<rect x=\"112\" y=\"114\" width=\"292\" height=\"60\" fill=\"white\"/>\n<rect x=\"112\" y=\"226\" width=\"292\" height=\"60\" fill=\"white\"/>\n<rect x=\"112\" y=\"338\" width=\"201.793\" height=\"60\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.google-apps.drawing": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#D93025\"/>\n<rect x=\"256\" y=\"256\" width=\"172\" height=\"172\" fill=\"white\"/>\n<circle cx=\"183.95\" cy=\"185.997\" r=\"106\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.google-apps.folder": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M480 99.4102C497.673 99.4102 512 113.737 512 131.41V432.168C512 449.841 497.673 464.168 480 464.168H32C14.327 464.168 0.000247407 449.841 0 432.168V99.4102H480ZM258.046 99.4092L0 99.4102V97.2773C0 70.8577 20.9583 49.4395 46.8115 49.4395H211.034L258.046 99.4092Z\" fill=\"#8F8F8F\"/>\n</svg>\n",
+  "application/vnd.google-apps.form": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#7627BB\"/>\n<path d=\"M174.009 174H110V114H174.009V174ZM402 174H198.074V114H402V174Z\" fill=\"white\"/>\n<path d=\"M174.009 398H112V338H174.009V398ZM400 398H198.074V338H400V398Z\" fill=\"white\"/>\n<path d=\"M174.009 286H110V226H174.009V286ZM402 286H198.074V226H402V286Z\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.google-apps.fusiontable": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#0F9D58\"/>\n<path d=\"M253.922 373.391L145.236 264.648L158.958 233.126L276.55 350.774L253.922 373.391Z\" fill=\"white\"/>\n<path d=\"M512 115.452L253.921 373.388L240.522 341.53L512 70.209V115.452Z\" fill=\"white\"/>\n<path d=\"M181.575 255.772L0 437.247V392.005L158.954 233.139L181.575 255.772Z\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.google-apps.map": "<svg width=\"418\" height=\"512\" viewBox=\"0 0 418 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M246.008 0.000976562L418 171.993V448.001C418 483.347 389.346 512.001 354 512.001H64C28.6539 512.001 0.000197916 483.347 0 448.001V64.001C0 28.6548 28.6538 0.000976562 64 0.000976562H246.008Z\" fill=\"#DF564B\"/>\n<path d=\"M418 172H310C274.654 172 246 143.346 246 108V0L418 172Z\" fill=\"#EEA9A3\"/>\n<path d=\"M289 268.89C289 313.636 227.688 350.473 208 434.869C189.438 348.785 127 313.636 127 268.89C127 224.143 163.265 187.869 208 187.869C252.735 187.869 289 224.143 289 268.89Z\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.google-apps.presentation": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#F4B400\"/>\n<rect x=\"53\" y=\"139.868\" width=\"404\" height=\"236\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.google-apps.script": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#1A73E8\"/>\n<rect x=\"53\" y=\"206.868\" width=\"188\" height=\"100\" fill=\"white\"/>\n<path d=\"M370 256.868L241 381.576L241 132.161L370 256.868Z\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.google-apps.site": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#3F51B5\"/>\n<rect x=\"84\" y=\"111.868\" width=\"344\" height=\"88\" fill=\"white\"/>\n<rect x=\"84\" y=\"255.868\" width=\"172\" height=\"144\" fill=\"white\"/>\n<rect x=\"312\" y=\"255.868\" width=\"116\" height=\"144\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.google-apps.spreadsheet": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#0F9D58\"/>\n<rect x=\"56\" y=\"167.868\" width=\"400\" height=\"60\" fill=\"white\"/>\n<rect x=\"170\" y=\"57.8682\" width=\"60\" height=\"396\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.google-apps.video": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M0 112.868C0 86.3585 21.4903 64.8682 48 64.8682H512V420.868C512 447.378 490.51 468.868 464 468.868H48C21.4903 468.868 0 447.378 0 420.868V112.868Z\" fill=\"#D93025\"/>\n<path d=\"M77 64.8682H155L204.5 165.868H128L77 64.8682Z\" fill=\"white\"/>\n<path d=\"M332 64.8682H410L459.5 165.868H383L332 64.8682Z\" fill=\"white\"/>\n<path d=\"M204.5 64.8682H282.5L332 165.868H255.5L204.5 64.8682Z\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.ms-works": "<svg width=\"512\" height=\"513\" viewBox=\"0 0 512 513\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M256.261 512H255.738L168.738 425H64C28.6538 425 0 396.346 0 361V64C0 28.6538 28.6538 0 64 0H448C483.346 0 512 28.6538 512 64V361C512 396.346 483.346 425 448 425H343.261L256.261 512Z\" fill=\"#FFD83D\"/>\n<rect x=\"56\" y=\"372\" width=\"400\" height=\"13\" fill=\"#990000\"/>\n<path d=\"M256.355 326.207L131.381 197.466L380.796 196.949L256.355 326.207ZM306.089 197.104L206.089 197.311L205.888 100.207L305.888 100L306.089 197.104Z\" fill=\"#990000\"/>\n</svg>\n",
+  "application/vnd.ms-xpsdocument": "<svg width=\"418\" height=\"512\" viewBox=\"0 0 418 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M246.008 0.000732422L418 171.993V448.001C418 483.347 389.346 512.001 354 512.001H64C28.6539 512.001 0.000197916 483.347 0 448.001V64.0007C0 28.6545 28.6538 0.000732422 64 0.000732422H246.008Z\" fill=\"#D09961\"/>\n<path d=\"M418 172H310C274.654 172 246 143.346 246 108V0L418 172Z\" fill=\"#ECD6BF\"/>\n<path d=\"M98.3984 370.946C98.3984 367.852 99.4297 365.274 101.492 363.211C103.555 361.102 106.344 360.047 109.859 360.047C113.375 360.047 116.164 361.102 118.227 363.211C120.289 365.274 121.32 367.852 121.32 370.946C121.32 374.039 120.289 376.618 118.227 378.68C116.164 380.743 113.375 381.774 109.859 381.774C106.344 381.774 103.555 380.743 101.492 378.68C99.4297 376.618 98.3984 374.039 98.3984 370.946ZM203.164 363.985V381H142.273V363.985H203.164ZM202.391 290.649L151.203 381H136.859V368.555L188.609 278.625H202.391V290.649ZM195.43 278.625V295.711H136.438V278.625H195.43ZM237.406 278.625V381H216.945V278.625H237.406ZM289.859 344.93H268.906V327.844H289.859C292.812 327.844 295.203 327.188 297.031 325.875C298.859 324.563 300.195 322.758 301.039 320.461C301.883 318.118 302.305 315.493 302.305 312.586C302.305 309.633 301.883 306.868 301.039 304.289C300.195 301.711 298.859 299.649 297.031 298.102C295.203 296.508 292.812 295.711 289.859 295.711H275.586V381H254.984V278.625H289.859C296.75 278.625 302.656 280.078 307.578 282.985C312.547 285.891 316.367 289.899 319.039 295.008C321.711 300.071 323.047 305.883 323.047 312.446C323.047 319.055 321.711 324.797 319.039 329.672C316.367 334.5 312.547 338.25 307.578 340.922C302.656 343.594 296.75 344.93 289.859 344.93Z\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.oasis.opendocument.presentation": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#FD7541\"/>\n<path d=\"M253.943 150.707C283.791 150.707 305.57 156.824 319.281 169.059C332.992 181.293 339.848 198.432 339.848 220.475C339.848 230.494 338.266 240.039 335.102 249.109C332.043 258.074 326.98 266.037 319.914 272.998C312.848 279.854 303.514 285.285 291.912 289.293C280.416 293.301 266.23 295.305 249.355 295.305H224.676V382H186.707V150.707H253.943ZM251.412 182.189H224.676V263.664H245.4C257.318 263.664 267.443 262.293 275.775 259.551C284.107 256.703 290.436 252.221 294.76 246.104C299.084 239.986 301.246 231.918 301.246 221.898C301.246 208.504 297.186 198.537 289.064 191.998C281.049 185.459 268.498 182.189 251.412 182.189Z\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.oasis.opendocument.spreadsheet": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#0F9D58\"/>\n<path d=\"M356.143 382H312.953L254.734 287.236L196.199 382H155.541L232.428 262.082L160.762 150.707H202.686L256.475 238.352L309.947 150.707H350.605L278.623 263.189L356.143 382Z\" fill=\"white\"/>\n</svg>\n",
+  "application/vnd.oasis.opendocument.text": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#4B87E4\"/>\n<path d=\"M406.768 150.707L346.334 382H304.885L266.283 243.414C265.334 240.039 264.279 236.031 263.119 231.391C261.959 226.75 260.799 222.004 259.639 217.152C258.584 212.301 257.635 207.871 256.791 203.863C256.053 199.75 255.525 196.586 255.209 194.371C254.998 196.586 254.523 199.697 253.785 203.705C253.047 207.713 252.15 212.143 251.096 216.994C250.146 221.74 249.092 226.486 247.932 231.232C246.771 235.873 245.717 239.986 244.768 243.572L206.799 382H165.508L105.232 150.707H143.359L176.74 286.287C177.795 290.611 178.85 295.305 179.904 300.367C181.064 305.324 182.119 310.334 183.068 315.396C184.123 320.459 185.072 325.416 185.916 330.268C186.76 335.014 187.445 339.338 187.973 343.24C188.5 339.232 189.186 334.803 190.029 329.951C190.873 324.994 191.77 319.984 192.719 314.922C193.773 309.754 194.828 304.797 195.883 300.051C197.043 295.305 198.203 291.033 199.363 287.236L237.016 150.707H274.035L312.479 287.711C313.639 291.613 314.746 295.99 315.801 300.842C316.961 305.693 318.068 310.65 319.123 315.713C320.178 320.775 321.127 325.68 321.971 330.426C322.814 335.172 323.5 339.443 324.027 343.24C324.766 338.072 325.715 332.166 326.875 325.521C328.035 318.877 329.354 312.127 330.83 305.271C332.307 298.416 333.783 292.088 335.26 286.287L368.482 150.707H406.768Z\" fill=\"white\"/>\n</svg>\n",
+  "application/x-shockwave-flash": "<svg width=\"418\" height=\"512\" viewBox=\"0 0 418 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M246.008 0.000732422L418 171.993V448.001C418 483.347 389.346 512.001 354 512.001H64C28.6539 512.001 0.000197916 483.347 0 448.001V64.0007C0 28.6545 28.6538 0.000732422 64 0.000732422H246.008Z\" fill=\"#D9385A\"/>\n<path d=\"M418 172H310C274.654 172 246 143.346 246 108V0L418 172Z\" fill=\"#F0AFBC\"/>\n<path d=\"M69.7812 370.946C69.7812 367.852 70.8125 365.274 72.875 363.211C74.9375 361.102 77.7266 360.047 81.2422 360.047C84.7578 360.047 87.5469 361.102 89.6094 363.211C91.6719 365.274 92.7031 367.852 92.7031 370.946C92.7031 374.039 91.6719 376.618 89.6094 378.68C87.5469 380.743 84.7578 381.774 81.2422 381.774C77.7266 381.774 74.9375 380.743 72.875 378.68C70.8125 376.618 69.7812 374.039 69.7812 370.946ZM154.367 354.071C154.367 352.243 154.203 350.578 153.875 349.078C153.547 347.578 152.844 346.196 151.766 344.93C150.734 343.664 149.211 342.399 147.195 341.133C145.227 339.868 142.648 338.555 139.461 337.196C135.664 335.602 131.984 333.914 128.422 332.133C124.859 330.305 121.648 328.196 118.789 325.805C115.93 323.414 113.656 320.602 111.969 317.368C110.328 314.086 109.508 310.243 109.508 305.836C109.508 301.524 110.281 297.61 111.828 294.094C113.422 290.578 115.672 287.578 118.578 285.094C121.484 282.563 124.883 280.618 128.773 279.258C132.711 277.899 137.094 277.219 141.922 277.219C148.484 277.219 154.156 278.578 158.938 281.297C163.766 284.016 167.492 287.743 170.117 292.477C172.789 297.211 174.125 302.649 174.125 308.789H153.594C153.594 305.883 153.172 303.328 152.328 301.125C151.531 298.875 150.242 297.118 148.461 295.852C146.68 294.586 144.383 293.953 141.57 293.953C138.945 293.953 136.766 294.493 135.031 295.571C133.344 296.602 132.078 298.032 131.234 299.86C130.438 301.641 130.039 303.657 130.039 305.907C130.039 307.594 130.438 309.118 131.234 310.477C132.078 311.789 133.227 312.985 134.68 314.063C136.133 315.094 137.844 316.102 139.812 317.086C141.828 318.071 144.031 319.032 146.422 319.969C151.062 321.797 155.164 323.813 158.727 326.016C162.289 328.172 165.266 330.61 167.656 333.328C170.047 336 171.852 339.024 173.07 342.399C174.289 345.774 174.898 349.618 174.898 353.93C174.898 358.196 174.148 362.086 172.648 365.602C171.195 369.071 169.062 372.071 166.25 374.602C163.438 377.086 160.039 379.008 156.055 380.368C152.117 381.727 147.711 382.407 142.836 382.407C138.102 382.407 133.625 381.75 129.406 380.438C125.188 379.078 121.461 377.039 118.227 374.321C115.039 371.555 112.531 368.063 110.703 363.844C108.875 359.578 107.961 354.539 107.961 348.727H128.562C128.562 351.821 128.867 354.469 129.477 356.672C130.086 358.828 131.023 360.563 132.289 361.875C133.555 363.141 135.102 364.102 136.93 364.758C138.805 365.368 140.938 365.672 143.328 365.672C146.047 365.672 148.203 365.157 149.797 364.125C151.438 363.094 152.609 361.711 153.312 359.977C154.016 358.243 154.367 356.274 154.367 354.071ZM209.703 365.672L226.086 278.625H236.914L240.148 292.125L222.57 381H210.828L209.703 365.672ZM204.078 278.625L217.297 365.883L215.047 381H202.109L183.758 278.625H204.078ZM252.031 365.532L265.18 278.625H285.43L267.219 381H254.211L252.031 365.532ZM243.172 278.625L259.695 366.164L258.359 381H246.617L229.109 291.985L232.414 278.625H243.172ZM317.422 278.625V381H296.82V278.625H317.422ZM349.484 322.149V339.164H312.219V322.149H349.484ZM353.422 278.625V295.711H312.219V278.625H353.422Z\" fill=\"white\"/>\n</svg>\n",
+  "audio/mpeg": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#D93025\"/>\n<path d=\"M426 393.868C426 411.541 411.673 425.868 394 425.868H314V313.868H370C370 313.868 370 321.368 370 255.868C370 190.368 318.5 142.868 256 142.868C193.5 142.868 142 188.368 142 255.868V313.868H198V425.868H118C100.327 425.868 86 411.541 86 393.868V255.868C86 161.98 162.112 85.8682 256 85.8682C349.888 85.8682 426 161.98 426 255.868V393.868Z\" fill=\"white\"/>\n</svg>\n",
+  "image/bmp": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"512\" height=\"512\" rx=\"64\" fill=\"#D93025\"/>\n<path d=\"M158.5 299.868L256.794 425.868H60.2061L158.5 299.868Z\" fill=\"white\"/>\n<path d=\"M326.5 255.868L454.239 426.118H198.761L326.5 255.868Z\" fill=\"white\"/>\n</svg>\n",
+  "unknown": "<svg width=\"418\" height=\"512\" viewBox=\"0 0 418 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M246.008 0.000976562L418 171.993V448.001C418 483.347 389.346 512.001 354 512.001H64C28.6539 512.001 0.000197916 483.347 0 448.001V64.001C0 28.6548 28.6538 0.000976562 64 0.000976562H246.008Z\" fill=\"#8F8B98\"/>\n<path d=\"M418 172H310C274.654 172 246 143.346 246 108V0L418 172Z\" fill=\"#E1E1E1\"/>\n</svg>\n",
+  "video/x-la-asf": "<svg width=\"512\" height=\"512\" viewBox=\"0 0 512 512\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect y=\"380.867\" width=\"512\" height=\"88\" fill=\"#B46D2C\"/>\n<rect x=\"305.699\" y=\"64.8672\" width=\"188\" height=\"100\" transform=\"rotate(89.8814 305.699 64.8672)\" fill=\"#B46D2C\"/>\n<path d=\"M256.356 381.97L131.381 253.228L380.796 252.712L256.356 381.97Z\" fill=\"#B46D2C\"/>\n</svg>\n"
+}
+
+@Injectable({ providedIn: 'root' })
+export class DSvgIconRegister {
+  constructor() {
+    const matIconRegistry = inject(MatIconRegistry);
+    const domSanitizer = inject(DomSanitizer);
+
+    [
+      'application/vnd.google-apps.video',
+      'video/3gpp',
+      'video/mp4',
+      'video/mpeg',
+      'video/quicktime',
+      'video/x-dv',
+      'video/x-flv',
+      'video/x-m4v',
+      'video/x-ms-asf',
+      'video/x-ms-wmv',
+      'video/x-msvideo',
+      'video/x-ivf',
+      'video/x-ms-wmp',
+      'video/3gpp2',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(SVG_ICONS['application/vnd.google-apps.video'])
+      )
+    );
+
+    [
+      'application/octet-stream',
+      'application/arj',
+      'application/cab',
+      'application/x-7z-compressed',
+      'text/js',
+      'application/atom+xml',
+      'application/directx',
+      'application/envoy',
+      'application/etl',
+      'application/fractals',
+      'application/fsharp-script',
+      'application/futuresplash',
+      'application/internet-property-stream',
+      'application/liquidmotion',
+      'application/ms-vsi',
+      'application/msaccess.addin',
+      'application/msaccess.cab',
+      'application/msaccess.ftemplate',
+      'application/msaccess.runtime',
+      'application/msaccess.webapplication',
+      'application/oda',
+      'application/oleobject',
+      'application/olescript',
+      'application/onenote',
+      'application/opensearchdescription+xml',
+      'application/pkcs10',
+      'application/pkix-crl',
+      'application/PowerShell',
+      'application/rat-file',
+      'application/sdp',
+      'application/set-payment-initiation',
+      'application/set-registration-initiation',
+      'application/streamingmedia',
+      'application/vnd.adobe.air-application/installer-package+zip',
+      'application/vnd.fdf',
+      'application/vnd.google-apps.audio',
+      'application/vnd.google-apps.drive-sdk',
+      'application/vnd.google-apps.file',
+      'application/vnd.google-apps.photo',
+      'application/vnd.google-apps.shortcut',
+      'application/vnd.google-apps.unknown',
+      'application/vnd.ms-excel.addin.macroEnabled.12',
+      'application/vnd.ms-excel.sheet.binary.macroEnabled.12',
+      'application/vnd.ms-excel.sheet.macroEnabled.12',
+      'application/vnd.ms-excel.template.macroEnabled.12',
+      'application/vnd.ms-mediapackage',
+      'application/vnd.ms-office.calx',
+      'application/vnd.ms-pki.certstore',
+      'application/vnd.ms-pki.pko',
+      'application/vnd.ms-powerpoint.addin.macroEnabled.12',
+      'application/vnd.ms-powerpoint.presentation.macroEnabled.12',
+      'application/vnd.ms-powerpoint.slide.macroEnabled.12',
+      'application/vnd.ms-powerpoint.slideshow.macroEnabled.12',
+      'application/vnd.ms-powerpoint.template.macroEnabled.12',
+      'application/vnd.ms-visio.viewer',
+      'application/vnd.ms-word.document.macroEnabled.12',
+      'application/vnd.ms-word.template.macroEnabled.12',
+      'application/vnd.openxmlformats-officedocument.presentationml.slide',
+      'application/vnd.rn-realmedia',
+      'application/vnd.rn-rn_music_package',
+      'application/vnd.wap.wmlc',
+      'application/vnd.wap.wmlscriptc',
+      'application/vsix',
+      'application/windows-library+xml',
+      'application/windows-search-connector+xml',
+      'application/winhlp',
+      'application/x-bcpio',
+      'application/x-bridge-url',
+      'application/x-cdf',
+      'application/x-compress',
+      'application/x-cpio',
+      'application/x-csh',
+      'application/x-director',
+      'application/x-dvi',
+      'application/x-hdf',
+      'application/x-internet-signup',
+      'application/x-iphone',
+      'application/x-itunes-ipa',
+      'application/x-itunes-ipg',
+      'application/x-itunes-ipsw',
+      'application/x-itunes-ite',
+      'application/x-itunes-itlp',
+      'application/x-itunes-itms',
+      'application/x-itunes-itpc',
+      'application/x-java-applet',
+      'application/x-latex',
+      'application/x-miva-compiled',
+      'application/x-mmxp',
+      'application/x-mpeg',
+      'application/x-ms-license',
+      'application/x-ms-manifest',
+      'application/x-ms-reader',
+      'application/x-ms-vsto',
+      'application/x-ms-wmd',
+      'application/x-ms-xbap',
+      'application/x-msaccess',
+      'application/x-mscardfile',
+      'application/x-msclip',
+      'application/x-msmediaview',
+      'application/x-msmoney',
+      'application/x-msschedule',
+      'application/x-msterminal',
+      'application/x-mswrite',
+      'application/x-oleobject',
+      'application/x-perfmon',
+      'application/x-pkcs12',
+      'application/x-pkcs7-certificates',
+      'application/x-pkcs7-certreqresp',
+      'application/x-podcast',
+      'application/x-quicktimeplayer',
+      'application/x-safari-safariextz',
+      'application/x-safari-webarchive',
+      'application/x-sgimb',
+      'application/x-sh',
+      'application/x-shar',
+      'application/x-silverlight-app',
+      'application/x-smaf',
+      'application/x-stuffit',
+      'application/x-sv4cpio',
+      'application/x-sv4crc',
+      'application/x-tcl',
+      'application/x-tex',
+      'application/x-texinfo',
+      'application/x-troff-man',
+      'application/x-troff-me',
+      'application/x-troff-ms',
+      'application/x-ustar',
+      'application/x-wlpg-detect',
+      'application/x-wlpg3-detect',
+      'application/xaml+xml',
+      'application/xml',
+      'x-world/x-vrml',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/octet-stream']
+        )
+      )
+    );
+
+    [
+      'application/rtf',
+      'application/x-javascript',
+      'text/css',
+      'text/csv',
+      'text/html',
+      'text/plain',
+      'text/x-vcard',
+      'text/xml',
+      'application/xml',
+      'text/dlm',
+      'text/h323',
+      'text/iuls',
+      'text/jscript',
+      'text/richtext',
+      'text/scriptlet',
+      'text/sgml',
+      'text/vnd.wap.wml',
+      'text/vnd.wap.wmlscript',
+      'text/webviewhtml',
+      'text/x-component',
+      'text/x-hdml',
+      'text/x-html-insertion',
+      'text/x-ms-contact',
+      'text/x-ms-group',
+      'text/x-ms-iqy',
+      'text/x-ms-odc',
+      'text/x-ms-rqy',
+      'text/x-setext',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(SVG_ICONS['application/rtf'])
+      )
+    );
+
+    ['application/vnd.google-apps.script'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.google-apps.script']
+        )
+      )
+    );
+
+    ['application/vnd.google-apps.site'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.google-apps.site']
+        )
+      )
+    );
+
+    ['application/pdf'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(SVG_ICONS['application/pdf'])
+      )
+    );
+
+    [
+      'application/vnd.ms-powerpoint',
+      'application/vnd.oasis.opendocument.presentation',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+      'application/vnd.openxmlformats-officedocument.presentationml.template',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.oasis.opendocument.presentation']
+        )
+      )
+    );
+
+    [
+      'image/bmp',
+      'image/gif',
+      'image/jpeg',
+      'image/png',
+      'image/tiff',
+      'image/x-icon',
+      'image/cis-cod',
+      'image/ief',
+      'image/pict',
+      'image/vnd.ms-photo',
+      'image/vnd.rn-realflash',
+      'image/x-cmu-raster',
+      'image/x-cmx',
+      'image/x-jg',
+      'image/x-macpaint',
+      'image/x-portable-anymap',
+      'image/x-portable-bitmap',
+      'image/x-portable-graymap',
+      'image/x-portable-pixmap',
+      'image/x-quicktime',
+      'image/x-xbitmap',
+      'image/x-xpixmap',
+      'image/x-xwindowdump',
+      'image/pjpeg',
+      'image/vnd.wap.wbmp',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(SVG_ICONS['image/bmp'])
+      )
+    );
+
+    [
+      'audio/mpeg',
+      'audio/wav',
+      'audio/x-ms-wma',
+      'audio/audible',
+      'audio/m4a',
+      'audio/m4b',
+      'audio/m4p',
+      'audio/scpls',
+      'audio/vnd.audible.aax',
+      'audio/x-caf',
+      'audio/x-m4r',
+      'audio/x-ms-wax',
+      'audio/x-sd2',
+      'audio/x-smd',
+      'audio/ac3',
+      'audio/aiff',
+      'audio/basic',
+      'audio/mid',
+      'audio/vnd.dlna.adts',
+      'audio/x-aiff',
+      'audio/x-gsm',
+      'audio/x-pn-realaudio/plugin',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(SVG_ICONS['audio/mpeg'])
+      )
+    );
+
+    [
+      'application/vnd.ms-excel',
+      'application/vnd.oasis.opendocument.spreadsheet',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.template',
+      'text/tab-separated-values',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.oasis.opendocument.spreadsheet']
+        )
+      )
+    );
+
+    ['application/vnd.google-apps.presentation'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.google-apps.presentation']
+        )
+      )
+    );
+
+    ['application/vnd.google-apps.document'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.google-apps.document']
+        )
+      )
+    );
+
+    ['application/vnd.google-apps.spreadsheet'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.google-apps.spreadsheet']
+        )
+      )
+    );
+
+    [
+      'application/msword',
+      'application/vnd.oasis.opendocument.text',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.oasis.opendocument.text']
+        )
+      )
+    );
+
+    ['application/vnd.google-apps.form'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.google-apps.form']
+        )
+      )
+    );
+
+    ['application/vnd.google-apps.folder'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.google-apps.folder']
+        )
+      )
+    );
+
+    ['application/vnd.ms-xpsdocument'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.ms-xpsdocument']
+        )
+      )
+    );
+
+    ['application/vnd.google-apps.drawing'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.google-apps.drawing']
+        )
+      )
+    );
+
+    [
+      'application/vnd.ms-works',
+      'application/vnd.visio',
+      'image/x-rgb',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.ms-works']
+        )
+      )
+    );
+
+    [
+      'application/rar',
+      'application/tar',
+      'application/x-compressed',
+      'application/x-gtar',
+      'application/x-gzip',
+      'application/x-tar',
+      'application/x-zip-compressed',
+      'application/zip',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(SVG_ICONS['application/rar'])
+      )
+    );
+
+    [
+      'application/x-httpd-php',
+      'application/x-ms-application',
+      'application/x-x509-ca-cert',
+      'application/xhtml+xml',
+      'message/rfc822',
+      'application/x-msdownload',
+      'application/vnd.ms-project',
+      'drawing/x-dwf',
+      'application/java-archive',
+      'application/vnd.ms-pki.stl',
+      'text/vbscript',
+      'application/x-msmetafile',
+      'audio/x-mpegurl',
+      'audio/aac',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(SVG_ICONS.unknown)
+      )
+    );
+
+    ['application/vnd.google-apps.fusiontable'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.google-apps.fusiontable']
+        )
+      )
+    );
+
+    ['application/vnd.google-apps.map'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/vnd.google-apps.map']
+        )
+      )
+    );
+
+    ['application/postscript'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/postscript']
+        )
+      )
+    );
+
+    ['application/x-shockwave-flash'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(
+          SVG_ICONS['application/x-shockwave-flash']
+        )
+      )
+    );
+
+    ['application/msaccess'].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(SVG_ICONS['application/msaccess'])
+      )
+    );
+
+    [
+      'video/x-la-asf',
+      'video/x-ms-wm',
+      'video/x-ms-wmx',
+      'video/x-sgi-movie',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(SVG_ICONS['video/x-la-asf'])
+      )
+    );
+
+    [
+      'audio/x-pn-realaudio',
+      'application/hta',
+      'application/mac-binhex40',
+      'application/pics-rules',
+      'application/pkcs7-mime',
+      'application/pkcs7-signature',
+      'application/vnd.ms-officetheme',
+      'application/vnd.ms-pki.seccat',
+      'application/vnd.ms-wpl',
+      'application/wlmoviemaker',
+      'application/x-java-jnlp-file',
+      'application/x-ms-wmz',
+      'application/x-mspublisher',
+      'application/x-netcdf',
+      'application/x-troff',
+      'application/x-wais-source',
+      'video/vnd.dlna.mpeg-tts',
+      'video/x-ms-wvx',
+    ].forEach((alias) =>
+      matIconRegistry.addSvgIconLiteral(
+        alias,
+        domSanitizer.bypassSecurityTrustHtml(SVG_ICONS['application/hta'])
+      )
+    );
+  }
+}

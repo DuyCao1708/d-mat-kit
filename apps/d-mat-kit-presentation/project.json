@@ -2,7 +2,7 @@
   "name": "d-mat-kit-presentation",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "prefix": "app",
+  "prefix": "",
   "sourceRoot": "apps/d-mat-kit-presentation/src",
   "tags": [],
   "targets": {

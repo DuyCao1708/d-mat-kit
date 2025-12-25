@@ -1,1 +1,6 @@
-export * from './lib/d-mat-kit/d-mat-kit';
+export * from './lib/services';
+export * from './lib/models';
+export * from './lib/directives';
+export * from './lib/tokens';
+export * from './lib/modules';
+export * from './lib/components';

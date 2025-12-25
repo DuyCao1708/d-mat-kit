@@ -1,0 +1,49 @@
+:root {
+  --d-notification-success-title-color: #6cbe5d;
+  --d-notification-error-title-color: var(--mat-sys-error);
+  --d-notification-warn-title-color: #ffb876;
+
+  --d-notification-success-icon-color: #6cbe5d;
+  --d-notification-error-icon-color: var(--mat-sys-error);
+  --d-notification-warn-icon-color: #ffb876;
+
+  --d-toast-success-container-color: #ceeac9;
+  --d-toast-error-container-color: var(--mat-sys-error-container);
+  --d-toast-warn-container-color: #ffeee2;
+
+  --d-toast-success-text-color: #39872e;
+  --d-toast-error-text-color: var(--mat-sys-error);
+  --d-toast-warn-text-color: #e19c5c;
+
+  --d-toast-container-shape: 16px;
+  --d-toast-container-width: 380px;
+}
+
+.d-toasts-snack-bar-container {
+  &.mat-snack-bar-container-animations-enabled.mat-snack-bar-container-enter {
+    animation: none;
+  }
+
+  .mat-mdc-snackbar-surface {
+    box-shadow: none;
+    --mat-snack-bar-container-color: transparent;
+  }
+}
+
+@keyframes _d-toast-enter {
+  from {
+    opacity: 0;
+    transform: translateX(calc(100% + 16px)) scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes _d-toast-exit {
+  to {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}

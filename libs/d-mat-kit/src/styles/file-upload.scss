@@ -1,0 +1,34 @@
+:root {
+  --d-file-upload-progress-header-background-color: var(
+    --mat-sys-surface-container-low
+  );
+  --d-file-upload-progress-content-background-color: var(
+    --mat-sys-surface-container-lowest
+  );
+  --d-file-upload-progress-title-color: var(--mat-sys-on-surface-variant);
+  --d-file-upload-progress-container-width: 360px;
+  --d-file-upload-progress-container-max-height: 324px;
+  --d-file-upload-progress-container-shape: 16px;
+  --d-file-upload-progress-item-success-color: #34a853;
+  --d-file-upload-progress-item-error-color: #ba1a1a;
+  --d-file-upload-progress-item-name-color: var(--mat-sys-on-surface-variant);
+  --d-file-upload-progress-item-hover-state-color: var(
+    --mat-sys-surface-container
+  );
+}
+
+.d-file-upload-progress-animation-enter {
+   animation: _d-file-upload-progress-container-enter 0.1s;
+}
+
+@keyframes _d-file-upload-progress-container-enter {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
