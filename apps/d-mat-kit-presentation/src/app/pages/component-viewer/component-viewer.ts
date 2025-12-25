@@ -93,15 +93,40 @@ import { map, of, pairwise, startWith, Subject, takeUntil } from 'rxjs';
       <div style="background-color: red; width: 300px; height: 300px"></div>
     </mat-menu>
 
+    <div style="height: 40px"></div>
+
     <d-table
-      [columns]="[{ name: 'column1', header: ' hehe' }]"
-      [dataSource]="[{ column1: '1231231' }]"
+      [columns]="[
+        { name: 'column1', header: ' Column 1' },
+        { name: 'column2', header: ' Column 2' },
+        { name: 'column3', header: ' Column 3' },
+        { name: 'column4', header: ' Column 4' },
+        { name: 'column5', header: ' Column 5' },
+        { name: 'column6', header: ' Column 6' },
+        { name: 'column7', header: ' Column 7' },
+        { name: 'column8', header: ' Column 8' },
+        { name: 'column9', header: ' Column 9' }
+      ]"
+      [dataSource]="[
+        {
+          column1: 'This is cell 1 content',
+          column2: 'This is cell 2 content',
+          column3: 'This is cell 3 content',
+          column4: 'This is cell 4 content',
+          column5: 'This is cell 5 content',
+          column6: 'This is cell 6 content',
+          column7: 'This is cell 7 content',
+          column8: 'This is cell 8 content',
+          column9: 'This is cell 9 content',
+        }
+      ]"
     >
-      <ng-container dAltHeaderRow="hehe" trClass="bg-red-500">
-        <ng-container *dAltHeaderCellDef="'column1'" d-alt-header-cell
-          >alt header</ng-container
-        >
-      </ng-container>
+      <div
+        *dExpandableRowDef
+        style="border: 1px solid #aeaeae; border-radius: 12px; height: 300px; padding: 12px; margin: 12px;"
+      >
+        Expandable Content
+      </div>
     </d-table>
   `,
 })
