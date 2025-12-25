@@ -99,34 +99,35 @@ import { map, of, pairwise, startWith, Subject, takeUntil } from 'rxjs';
       [columns]="[
         { name: 'column1', header: ' Column 1' },
         { name: 'column2', header: ' Column 2' },
-        { name: 'column3', header: ' Column 3' },
-        { name: 'column4', header: ' Column 4' },
-        { name: 'column5', header: ' Column 5' },
-        { name: 'column6', header: ' Column 6' },
-        { name: 'column7', header: ' Column 7' },
-        { name: 'column8', header: ' Column 8' },
-        { name: 'column9', header: ' Column 9' }
+        { name: 'column3', header: ' Column 3' }
       ]"
       [dataSource]="[
         {
           column1: 'This is cell 1 content',
           column2: 'This is cell 2 content',
           column3: 'This is cell 3 content',
-          column4: 'This is cell 4 content',
-          column5: 'This is cell 5 content',
-          column6: 'This is cell 6 content',
-          column7: 'This is cell 7 content',
-          column8: 'This is cell 8 content',
-          column9: 'This is cell 9 content',
         }
       ]"
     >
-      <div
-        *dExpandableRowDef
-        style="border: 1px solid #aeaeae; border-radius: 12px; height: 300px; padding: 12px; margin: 12px;"
-      >
-        Expandable Content
-      </div>
+      <ng-container *dHeaderCellDef="'column1'">
+        Header 1 template
+      </ng-container>
+
+      <ng-container dAltHeaderRow="altHeaderRow">
+        <ng-container *dAltHeaderCellDef="'column1'">
+          Alternative Header 1 template
+        </ng-container>
+      </ng-container>
+
+      <ng-container *dCellDef="'column1'">
+        This is Cell 1 template
+      </ng-container>
+
+      <ng-container dFooterRow="footerRow">
+        <ng-container *dFooterCellDef="'column1'">
+          Footer 1 template
+        </ng-container>
+      </ng-container>
     </d-table>
   `,
 })
