@@ -37,24 +37,23 @@ import { map, of, pairwise, startWith, Subject, takeUntil } from 'rxjs';
   template: `
     <p>component-viewer works!</p>
 
-    <mat-form-field>
+    <!-- <mat-form-field>
       <mat-label>Toppings</mat-label>
       <mat-select multiple [value]="['hehe_1']" [dInfiniteScrollLoad]="test">
-        <!-- <cdk-virtual-scroll-viewport
+        <cdk-virtual-scroll-viewport
           itemSize="48"
           minBufferPx="480"
           maxBufferPx="480"
           style="height: 200px"
-        > -->
-        @for(option of options; track option.value ) {
-        <mat-option [value]="option.value">{{ option.text }}</mat-option>
-        }
-
-        <!-- </cdk-virtual-scroll-viewport> -->
+        >
+          @for(option of options; track option.value ) {
+          <mat-option [value]="option.value">{{ option.text }}</mat-option>
+          }
+        </cdk-virtual-scroll-viewport>
       </mat-select>
-    </mat-form-field>
+    </mat-form-field> -->
 
-    <mat-form-field style="margin-left: 16px">
+    <!-- <mat-form-field style="margin-left: 16px">
       <mat-label>Toppings</mat-label>
       <input
         type="text"
@@ -93,9 +92,9 @@ import { map, of, pairwise, startWith, Subject, takeUntil } from 'rxjs';
       <div style="background-color: red; width: 300px; height: 300px"></div>
     </mat-menu>
 
-    <div style="height: 40px"></div>
+    <div style="height: 40px"></div> -->
 
-    <d-table
+    <!-- <d-table
       [columns]="[
         { name: 'column1', header: ' Column 1' },
         { name: 'column2', header: ' Column 2' },
@@ -128,7 +127,7 @@ import { map, of, pairwise, startWith, Subject, takeUntil } from 'rxjs';
           Footer 1 template
         </ng-container>
       </ng-container>
-    </d-table>
+    </d-table> -->
   `,
 })
 export class ComponentViewer {
@@ -137,8 +136,23 @@ export class ComponentViewer {
   constructor() {
     inject(DNotification).toast({
       type: 'warn',
-      message: 'heheheh',
+      message: `
+# ⚠ Warning!
+**This is a Markdown toast message**
+- Item 1
+- Item 2
+      `,
       timeout: 1000,
+    });
+
+    inject(DNotification).notify({
+      type: 'success',
+      message: `
+# ✅ Success!
+**Markdown notification content**
+### Blockquote
+> This is a blockquote
+        `,
     });
 
     Array.from({ length: 100 }).map((_, index) =>
