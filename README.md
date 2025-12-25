@@ -217,7 +217,7 @@ constructor() {
 ```
 ![Swipe demo](https://raw.githubusercontent.com/DuyCao1708/d-mat-kit/refs/heads/develop/apps/d-mat-kit-presentation/public/swipe.gif)
   
-- **Leveraged Menu Trigger** – open Angular Material menus (`MatMenu`) on hover for smoother user interaction.
+- **Menu Trigger** – open Angular Material menus (`MatMenu`) on hover for smoother user interaction.
 
   ```html
   <button [dMenuTriggerFor]="redMenu" dMenuTriggerHoverable="true" matButton>
