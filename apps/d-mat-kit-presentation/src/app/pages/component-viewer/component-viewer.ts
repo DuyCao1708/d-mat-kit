@@ -72,16 +72,18 @@ import { map, of, pairwise, startWith, Subject, takeUntil } from 'rxjs';
         }
       </mat-autocomplete>
     </mat-form-field>
+-->
 
     <d-file-upload
-      style="width: 100px; height: 100px; background-color: red"
+      style="width: 100px; background-color: #dcdcdc; padding: 12px;"
       [formControl]="formControl"
     >
-      Kéo thả hoặc dán ảnh ở đây
+      <p style="margin-bottom: 4px;">Drag and drop or paste file here</p>
 
-      <button matButton dFileUploadTrigger>Hoặc click vào đây</button>
+      <button matButton dFileUploadTrigger>Or click here</button>
     </d-file-upload>
 
+    <!--
     <button matButton (click)="download()">download</button>
 
     <button [dMenuTriggerFor]="menu" dMenuTriggerHoverable="true" matButton>
@@ -145,27 +147,27 @@ export class ComponentViewer {
       timeout: 1000,
     });
 
-    inject(DNotification).notify({
-      type: 'success',
-      message: `
-# ✅ Success!
-**Markdown notification content**
-### Blockquote
-> This is a blockquote
-        `,
-    });
+    //     inject(DNotification).notify({
+    //       type: 'success',
+    //       message: `
+    // # ✅ Success!
+    // **Markdown notification content**
+    // ### Blockquote
+    // > This is a blockquote
+    //         `,
+    //     });
 
-    Array.from({ length: 100 }).map((_, index) =>
-      this._progress.track({
-        name: 'hehe' + index,
-        type: 'application/pdf',
-        progress$: of({
-          type: HttpEventType.UploadProgress,
-          loaded: Math.round(Math.random() * 100),
-          total: 100,
-        } as HttpEvent<any>),
-      })
-    );
+    // Array.from({ length: 100 }).map((_, index) =>
+    //   this._progress.track({
+    //     name: 'hehe' + index,
+    //     type: 'application/pdf',
+    //     progress$: of({
+    //       type: HttpEventType.UploadProgress,
+    //       loaded: Math.round(Math.random() * 100),
+    //       total: 100,
+    //     } as HttpEvent<any>),
+    //   })
+    // );
 
     const http = inject(HttpClient);
 
