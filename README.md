@@ -1,82 +1,267 @@
-# DMatKitPresentation
+# d-mat-kit (Work in Progress)
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+⚠️ **This library is currently under development. Features may change.**  
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+A collection of Angular utilities and UI components **built on top of Angular Material** to simplify development and enhance your applications. This library provides **wrappers, services, components, and directives** with extended functionality out of the box. 
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## Features
 
-## Finish your CI setup
+### Table Wrapper
+Enhanced table component (based on `MatTable`) with:  
+- **Expandable Rows** – easily expand rows to show additional content.
+- **Sticky Horizontal Expandable Row** – keep expanded content visible when scrolling.
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/PbnwcrBT0D)
+  ```html
+  <d-table
+    [columns]="[
+      { name: 'column1', header: ' Column 1' },
+       ...
+    ]"
+    [dataSource]="[
+      {
+        column1: 'This is cell 1 content',
+        ...
+      }
+    ]"
+  >
+    <div
+      *dExpandableRowDef
+      style="border: 1px solid #aeaeae; border-radius: 12px; height: 300px; padding: 12px; margin: 12px;"
+    >
+      Expandable Content
+    </div>
+  </d-table>
+  ```
+
+  ![Expandable Row Demo](https://raw.githubusercontent.com/DuyCao1708/d-mat-kit/refs/heads/develop/apps/d-mat-kit-presentation/public/sticky-expandable-row.gif)
+
+- **Easy Template Mapping** – automatically maps your templates to the corresponding columns.
+
+  ```html
+  <d-table
+      [columns]="[
+        { name: 'column1', header: ' Column 1' },
+        { name: 'column2', header: ' Column 2' },
+        { name: 'column3', header: ' Column 3' }
+      ]"
+      [dataSource]="[
+        {
+          column1: 'This is cell 1 content',
+          column2: 'This is cell 2 content',
+          column3: 'This is cell 3 content',
+        }
+      ]"
+    >
+      <ng-container *dHeaderCellDef="'column1'">
+        Header 1 template
+      </ng-container>
+
+      <ng-container dAltHeaderRow="altHeaderRow">
+        <ng-container *dAltHeaderCellDef="'column1'">
+          Alternative Header 1 template
+        </ng-container>
+      </ng-container>
+
+      <ng-container *dCellDef="'column1'">
+        This is Cell 1 template
+      </ng-container>
+
+      <ng-container dFooterRow="footerRow">
+        <ng-container *dFooterCellDef="'column1'">
+          Footer 1 template
+        </ng-container>
+      </ng-container>
+    </d-table>
+  ```
+
+  ![Automapping Demo](https://raw.githubusercontent.com/DuyCao1708/d-mat-kit/refs/heads/develop/apps/d-mat-kit-presentation/public/automapping-column.png)
+
+### Notification Service
+Flexible notification system built on Angular Material components:  
+- **Dialog Notifications** – modal-style alerts (`MatDialog`).  
+- **Toast Notifications** – non-intrusive, auto-dismissing messages (`MatSnackBar`).
+
+This service **supports Markdown** content via [ngx-markdown](https://github.com/jfcere/ngx-markdown) and uses **animations inspired by [SweetAlert2](https://github.com/sweetalert2/sweetalert2)**
+
+  ```ts
+  constructor() {
+    inject(DNotification).toast({
+      type: 'warn',
+      message: `
+        # ⚠ Warning!
+        **This is a Markdown toast message**
+        - Item 1
+        - Item 2
+      `,
+      timeout: 1000,
+    });
+
+    inject(DNotification).notify({
+      type: 'success',
+      message: `
+        # ✅ Success!
+        **Markdown notification content**
+        ### Blockquote
+        > This is a blockquote
+        `,
+    });
+   }
+  ```
+
+  | Dialog Notification | Toast |
+  |-------------------|-------|
+  | ![Dialog notification Demo](https://raw.githubusercontent.com/DuyCao1708/d-mat-kit/refs/heads/develop/apps/d-mat-kit-presentation/public/dialog-notification.png) | ![Toast Demo](https://raw.githubusercontent.com/DuyCao1708/d-mat-kit/refs/heads/develop/apps/d-mat-kit-presentation/public/toast.png) |
 
 
-## Run tasks
+### File Uploader Component
 
-To run the dev server for your app, use:
+A flexible file uploader component built for Angular, with features to simplify file uploads using **drag & drop**, **paste**, or **file selection**.  
 
-```sh
-npx nx serve d-mat-kit-presentation
+- **Drag & Drop** – drop files anywhere in the upload zone.  
+- **Paste files** – paste copied files from clipboard.  
+- **File selection** – select files via standard file input.  
+- **Reactive Forms support** – bind uploaded files to Angular Reactive Forms.  
+- **Server-side upload tracking** – uses a service to monitor upload progress for each file.  
+
+```html
+<d-file-upload
+  style="width: 100px; background-color: #dcdcdc; padding: 12px;"
+  [formControl]="formControl"
+>
+  <p style="margin-bottom: 4px;">Drag and drop or paste file here</p>
+
+  <button matButton dFileUploadTrigger>Or click here</button>
+</d-file-upload>
 ```
 
-To create a production bundle:
+```ts
+private _progress = inject(DFileUploadProgress);
 
-```sh
-npx nx build d-mat-kit-presentation
+formControl = new FormControl<File[] | null>(null);
+
+constructor() {
+  const uploadedFiles = new WeakSet<File>();
+
+  this.formControl.valueChanges.subscribe((files) => {
+    for (let file of files || []) {
+      if (uploadedFiles.has(file)) continue;
+
+      uploadedFiles.add(file);
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const progress$ = http.post(
+          `your-file-upload-api-url`,
+          formData,
+          {
+            reportProgress: true,
+            observe: 'events',
+          }
+        );
+
+        this._progress.track({
+          name: file.name,
+          type: file.type,
+          progress$,
+        });
+    }
+  })
+}
 ```
 
-To see all available targets to run for a project, run:
+![File uploader demo](https://raw.githubusercontent.com/DuyCao1708/d-mat-kit/refs/heads/develop/apps/d-mat-kit-presentation/public/file-uploader.gif)
 
-```sh
-npx nx show project d-mat-kit-presentation
+### Directives
+- **Infinite Scroll** – trigger load function for more data when scrolling reaches the end.
+
+  ```html
+  <mat-form-field>
+      <mat-label>Toppings</mat-label>
+      <mat-select multiple [value]="['Option_1']" [dInfiniteScrollLoad]="loadForMore">
+        @for(option of options; track option.value ) {
+          <mat-option [value]="option.value">{{ option.text }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  ```
+
+  ```ts
+  options = Array.from({ length: 100 }).map((_, i) => ({
+    value: i,
+    text: `Option_${i}`,
+  }));
+  
+  loadForMore = () => {
+    this.options = [
+      ...this.options.concat(
+        ...Array.from({ length: 100 }).map((_, i) => ({
+          value: i,
+          text: `Option_${this.options.length + i}`,
+        }))
+      ),
+    ];
+  };
+  ```
+
+  ![Infinite scroll demo](https://raw.githubusercontent.com/DuyCao1708/d-mat-kit/refs/heads/develop/apps/d-mat-kit-presentation/public/infinite-scroll.gif)
+  
+- **Swipe Support** – detect swipe gestures for interactive components.
+
+```html
+<div
+  d-swipeable
+  [threshold]="100"
+  (swiped)="handleOnSwiped()"
+></div>
+```
+![Swipe demo](https://raw.githubusercontent.com/DuyCao1708/d-mat-kit/refs/heads/develop/apps/d-mat-kit-presentation/public/swipe.gif)
+  
+- **Leveraged Menu Trigger** – open Angular Material menus (`MatMenu`) on hover for smoother user interaction.
+
+  ```html
+  <button [dMenuTriggerFor]="redMenu" dMenuTriggerHoverable="true" matButton>
+    Red trigger
+  </button>
+
+  <button [dMenuTriggerFor]="greenMenu" dMenuTriggerHoverable="true" matButton>
+    Green trigger
+  </button>
+
+  <mat-menu #redMenu>
+    <div style="background-color: red; width: 300px; height: 300px"></div>
+  </mat-menu>
+
+  <mat-menu #greenMenu>
+    <div style="background-color: green; width: 300px; height: 300px"></div>
+  </mat-menu>
+  ```
+
+  ![Menu trigger demo](https://raw.githubusercontent.com/DuyCao1708/d-mat-kit/refs/heads/develop/apps/d-mat-kit-presentation/public/menu-trigger.gif)
+
+## Configuration
+
+Configure `d-mat-kit` features globally in `app.config.ts` including default options and **i18n**
+
+```ts
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(appRoutes),
+    provideHttpClient(),
+    provideDMatKit(
+      withNotification(),
+      withTable({
+        options: { stickyDefaultHeaderRow: true },
+        intl: { noDataRow: 'Không có dữ liệu trong bảng' },
+      }),
+      withFileUpload()
+    ),
+  ],
+};
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+## Installation
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/angular:app demo
-```
-
-To generate a new library, use:
-
-```sh
-npx nx g @nx/angular:lib mylib
-```
-
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
-
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Not ready yet!
