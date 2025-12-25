@@ -1,4 +1,5 @@
-import { TemplateRef } from '@angular/core';
+import { Direction } from '@angular/cdk/bidi';
+import { TemplateRef, ViewContainerRef } from '@angular/core';
 
 /**
  * Type of the notification. Affects the visual style of the notification.
@@ -47,8 +48,6 @@ export type DNotificationOptions = {
  * Options for displaying a toast notification using the DNotification service.
  */
 export type DToastOptions = {
-  /** Type of the toast */
-  type: DNotificationType | 'error' | 'success' | 'warn';
   /** The main message displayed the toast. */
   message: string;
   /**
@@ -62,6 +61,51 @@ export type DToastOptions = {
    */
   swipeable?: boolean;
 };
+
+/** Possible values for horizontalPosition on DToastConfig. */
+export type DToastHorizontalPosition =
+  | 'start'
+  | 'center'
+  | 'end'
+  | 'left'
+  | 'right';
+
+/** Possible values for verticalPosition on DToastConfig. */
+export type DToastVerticalPosition = 'top' | 'bottom';
+
+/** Configuration used when opening a toast. */
+export class DToastConfig {
+  /**
+   * The view container that serves as the parent for the toast for the purposes of dependency
+   * injection. Note: this does not affect where the toast is inserted in the DOM.
+   */
+  viewContainerRef?: ViewContainerRef;
+
+  /** The length of time in milliseconds to wait before automatically dismissing the toast. */
+  duration?: number = 0;
+
+  /** Extra CSS classes to be added to the toast container. */
+  panelClass?: string | string[];
+
+  /** Text layout direction for the toast. */
+  direction?: Direction;
+
+  /** The horizontal position to place the toast. */
+  horizontalPosition?: DToastHorizontalPosition = 'right';
+
+  /** The vertical position to place the toast. */
+  verticalPosition?: DToastVerticalPosition = 'top';
+
+  /** Whether the user can close the toast using a swipe gesture. */
+  swipeable?: boolean = true;
+
+  /** Type of the toast */
+  type: DNotificationType | 'error' | 'success' | 'warn' = 'success';
+}
+
+export class DToastRef {
+  
+}
 
 /** Global options for DNotification service. */
 export type DNofiticationGlobalOptions = {

@@ -4,14 +4,12 @@ import {
   MatDialogConfig,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { DNotificationOptions, DToastOptions } from '../../models/notification';
+import { DNotificationOptions, DToastConfig, DToastOptions, DToastRef } from '../models/notification';
 import { BehaviorSubject, take } from 'rxjs';
-import { DToastOptionsWithId } from '../../models/notification/toast-options-with-id';
-import { NOTIFICATION_OPTIONS } from '../../tokens/config';
-import {
-  DToastsOutlet,
-} from '../../components/notification/toast-dialog';
-import { DNotificationDialog } from '../../components/notification/notification-dialog';
+import { DToastOptionsWithId } from '../models/notification/toast-options-with-id';
+import { NOTIFICATION_OPTIONS } from '../tokens/config';
+import { DToastsOutlet } from '../components/notification/toast-dialog';
+import { DNotificationDialog } from '../components/notification/notification-dialog';
 import {
   MatSnackBar,
   MatSnackBarConfig,
@@ -26,7 +24,6 @@ import {
 })
 export class DNotification {
   private readonly _dialog = inject(MatDialog);
-  private readonly _matSnackBar = inject(MatSnackBar);
   private _toastsOptions: DToastOptionsWithId[] = [];
   private readonly _toastsOptions$ = new BehaviorSubject<DToastOptionsWithId[]>(
     this._toastsOptions
@@ -60,37 +57,37 @@ export class DNotification {
    * @returns A `MatSnackBarRef` to the toasts outlet
    */
   toast(
-    options: DToastOptions,
-    config?: MatSnackBarConfig
-  ): MatSnackBarRef<DToastsOutlet> {
-    const snackBarConfig: MatSnackBarConfig = {
-      ...config,
-      horizontalPosition: config?.horizontalPosition ?? 'end',
-      verticalPosition: config?.verticalPosition ?? 'top',
-      panelClass: [
-        ...([config?.panelClass].flat().filter(Boolean) as string[]),
-        'd-toasts-snack-bar-container',
-      ],
-      data: this._toastsOptions$.asObservable(),
-    };
+    message: string,
+    config?: DToastConfig
+  ): DToastRef |void {
+    // const snackBarConfig: MatSnackBarConfig = {
+    //   ...config,
+    //   horizontalPosition: config?.horizontalPosition ?? 'end',
+    //   verticalPosition: config?.verticalPosition ?? 'top',
+    //   panelClass: [
+    //     ...([config?.panelClass].flat().filter(Boolean) as string[]),
+    //     'd-toasts-snack-bar-container',
+    //   ],
+    //   data: this._toastsOptions$.asObservable(),
+    // };
 
-    if (!this._toastSnackBarRef) {
-      this._toastSnackBarRef = this._matSnackBar.openFromComponent(
-        DToastsOutlet,
-        snackBarConfig
-      );
+    // if (!this._toastSnackBarRef) {
+    //   this._toastSnackBarRef = this._matSnackBar.openFromComponent(
+    //     DToastsOutlet,
+    //     snackBarConfig
+    //   );
 
-      this.listenToDialogClose();
-      this.listenToToastClose();
-    }
+    //   this.listenToDialogClose();
+    //   this.listenToToastClose();
+    // }
 
-    const id = this.setToastOptionsToSubject(options);
-    this.removeToastByTimeout(
-      id,
-      options.timeout ?? this._defaultOptions.toastTimeout
-    );
+    // const id = this.setToastOptionsToSubject(options);
+    // this.removeToastByTimeout(
+    //   id,
+    //   options.timeout ?? this._defaultOptions.toastTimeout
+    // );
 
-    return this._toastSnackBarRef;
+    // return this._toastSnackBarRef;
   }
 
   private listenToToastClose(): void {
@@ -128,4 +125,10 @@ export class DNotification {
       .pipe(take(1))
       .subscribe(() => (this._toastSnackBarRef = null));
   }
+
+
+
+
+
+  // private attach()
 }

@@ -78,12 +78,14 @@ export class DToast {
 
   /** Dynamically binds background color based on the toast type. */
   protected get getBackgroundColor() {
-    return `var( --d-toast-${this.options().type}-container-color)`;
+    // return `var( --d-toast-${this.options().type}-container-color)`;
+    return `var( --d-toast-success-container-color)`;
   }
 
   /** Dynamically binds text color based on the toast type. */
   protected get getTextColor() {
-    return `var( --d-toast-${this.options().type}-text-color)`;
+    // return `var( --d-toast-${this.options().type}-text-color)`;
+    return `var( --d-toast-success-text-color)`;
   }
 
   /**
@@ -104,7 +106,8 @@ export class DToast {
    * - warn → warning
    */
   get matFontIcon() {
-    switch (this.options().type) {
+    // switch (this.options().type) {
+    switch ('success' as 'success' | 'error' | 'warn') {
       case 'success':
       case DNotificationType.Success:
         return 'check_circle';

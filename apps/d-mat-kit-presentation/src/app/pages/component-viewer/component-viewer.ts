@@ -109,11 +109,7 @@ export class ComponentViewer {
   private _progress = inject(DFileUploadProgress);
 
   constructor() {
-    inject(DNotification).toast({
-      type: 'warn',
-      message: 'heheheh',
-      timeout: 1000,
-    });
+    inject(DNotification).toast('heheheh');
 
     Array.from({ length: 100 }).map((_, index) =>
       this._progress.track({

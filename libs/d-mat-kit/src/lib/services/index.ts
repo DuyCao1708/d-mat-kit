@@ -1,2 +1,2 @@
-export * from './notification/notification';
+export * from './notification';
 export * from './file-upload-progress';
