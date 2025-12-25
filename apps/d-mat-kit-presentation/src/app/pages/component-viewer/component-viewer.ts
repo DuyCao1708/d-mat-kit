@@ -35,21 +35,18 @@ import { map, of, pairwise, startWith, Subject, takeUntil } from 'rxjs';
     ReactiveFormsModule,
   ],
   template: `
-    <p>component-viewer works!</p>
+    <!-- <p>component-viewer works!</p>
 
-    <!-- <mat-form-field>
-      <mat-label>Toppings</mat-label>
-      <mat-select multiple [value]="['hehe_1']" [dInfiniteScrollLoad]="test">
-        <cdk-virtual-scroll-viewport
-          itemSize="48"
-          minBufferPx="480"
-          maxBufferPx="480"
-          style="height: 200px"
-        >
-          @for(option of options; track option.value ) {
-          <mat-option [value]="option.value">{{ option.text }}</mat-option>
-          }
-        </cdk-virtual-scroll-viewport>
+    <mat-form-field>
+      <mat-label>Select option</mat-label>
+      <mat-select
+        multiple
+        [value]="['Option_1']"
+        [dInfiniteScrollLoad]="loadForMore"
+      >
+        @for(option of options; track option.value ) {
+        <mat-option [value]="option.value">{{ option.text }}</mat-option>
+        }
       </mat-select>
     </mat-form-field> -->
 
@@ -74,27 +71,39 @@ import { map, of, pairwise, startWith, Subject, takeUntil } from 'rxjs';
     </mat-form-field>
 -->
 
-    <d-file-upload
+    <!-- <d-file-upload
       style="width: 100px; background-color: #dcdcdc; padding: 12px;"
       [formControl]="formControl"
     >
       <p style="margin-bottom: 4px;">Drag and drop or paste file here</p>
 
       <button matButton dFileUploadTrigger>Or click here</button>
-    </d-file-upload>
+    </d-file-upload> -->
 
     <!--
-    <button matButton (click)="download()">download</button>
+    <button matButton (click)="download()">download</button>-->
 
-    <button [dMenuTriggerFor]="menu" dMenuTriggerHoverable="true" matButton>
-      trigger
+    <button [dMenuTriggerFor]="redMenu" dMenuTriggerHoverable="true" matButton>
+      Red trigger
     </button>
 
-    <mat-menu #menu>
+    <button
+      [dMenuTriggerFor]="greenMenu"
+      dMenuTriggerHoverable="true"
+      matButton
+    >
+      Green trigger
+    </button>
+
+    <mat-menu #redMenu>
       <div style="background-color: red; width: 300px; height: 300px"></div>
     </mat-menu>
 
-    <div style="height: 40px"></div> -->
+    <mat-menu #greenMenu>
+      <div style="background-color: green; width: 300px; height: 300px"></div>
+    </mat-menu>
+
+    <!-- <div style="height: 40px"></div>  -->
 
     <!-- <d-table
       [columns]="[
@@ -206,17 +215,18 @@ export class ComponentViewer {
 
   options = Array.from({ length: 100 }).map((_, i) => ({
     value: i,
-    text: `hehe_${i}`,
+    text: `Option_${i}`,
   }));
 
-  test = (v: any) => {
+  loadForMore = (v: any) => {
     console.log('scrolled to end');
 
     this.options = [
       ...this.options.concat(
-        ...Array.from({ length: 200 })
-          .map((_, i) => ({ value: i, text: `hehe_${i}` }))
-          .slice(100)
+        ...Array.from({ length: 100 }).map((_, i) => ({
+          value: i,
+          text: `Option_${this.options.length + i}`,
+        }))
       ),
     ];
 
